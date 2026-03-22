@@ -1062,82 +1062,82 @@ function renderConv() {
 // ── VOCAB ──
 const VOCAB = {
   '숫자': [
-    { jp:'一', read:'이치', ko:'1', ex:'一つ (히토츠) — 하나' },
-    { jp:'二', read:'니', ko:'2', ex:'二つ (후타츠) — 둘' },
-    { jp:'三', read:'산', ko:'3', ex:'三つ (밋츠) — 셋' },
+    { jp:'一', read:'이치 / 히토', ko:'1', ex:'一つ (히토츠) — 하나', reads:['いち','ひと'] },
+    { jp:'二', read:'니 / 후타', ko:'2', ex:'二つ (후타츠) — 둘', reads:['に','ふた'] },
+    { jp:'三', read:'산 / 미', ko:'3', ex:'三つ (밋츠) — 셋', reads:['さん','み'] },
     { jp:'四', read:'시 / 욘', ko:'4', ex:'四つ (욧츠) — 넷', reads:['し','よん'] },
-    { jp:'五', read:'고', ko:'5', ex:'五つ (이츠츠) — 다섯' },
-    { jp:'六', read:'로쿠', ko:'6', ex:'六つ (뭇츠) — 여섯' },
+    { jp:'五', read:'고 / 이츠', ko:'5', ex:'五つ (이츠츠) — 다섯', reads:['ご','いつ'] },
+    { jp:'六', read:'로쿠 / 무', ko:'6', ex:'六つ (뭇츠) — 여섯', reads:['ろく','む'] },
     { jp:'七', read:'시치 / 나나', ko:'7', ex:'七つ (나나츠) — 일곱', reads:['しち','なな'] },
-    { jp:'八', read:'하치', ko:'8', ex:'八つ (야츠) — 여덟' },
+    { jp:'八', read:'하치 / 야', ko:'8', ex:'八つ (야츠) — 여덟', reads:['はち','や'] },
     { jp:'九', read:'쿠 / 큐우', ko:'9', ex:'九つ (코코노츠) — 아홉', reads:['く','きゅう'] },
-    { jp:'十', read:'쥬우', ko:'10', ex:'十 (토오) — 열' },
-    { jp:'百', read:'햐쿠', ko:'100', ex:'百円 — 100엔' },
-    { jp:'千', read:'센', ko:'1,000', ex:'千円 — 1000엔' },
-    { jp:'万', read:'만', ko:'10,000', ex:'一万円 — 1만엔' },
+    { jp:'十', read:'쥬우 / 토오', ko:'10', ex:'十 (토오) — 열', reads:['じゅう','とお'] },
+    { jp:'百', read:'햐쿠', ko:'100', ex:'百円 — 100엔', reads:['ひゃく'] },
+    { jp:'千', read:'센', ko:'1,000', ex:'千円 — 1000엔', reads:['せん'] },
+    { jp:'万', read:'만', ko:'10,000', ex:'一万円 — 1만엔', reads:['まん'] },
   ],
   '대명사': [
-    { jp:'私', read:'와타시', ko:'나 / 저', ex:'私は学生です — 저는 학생입니다' },
-    { jp:'僕', read:'보쿠', ko:'나 (남성 구어)', ex:'남자가 친근하게 쓸 때' },
-    { jp:'あなた', read:'아나타', ko:'당신 / 너', ex:'あなたの名前は？ — 당신 이름은?' },
-    { jp:'彼', read:'카레', ko:'그 / 그 남자', ex:'彼は先生です — 그는 선생님입니다' },
-    { jp:'彼女', read:'카노죠', ko:'그녀 / 여자친구', ex:'彼女は学生です — 그녀는 학생입니다' },
-    { jp:'私たち', read:'와타시타치', ko:'우리', ex:'私たちは友達 — 우리는 친구' },
-    { jp:'これ', read:'코레', ko:'이것', ex:'これは何ですか — 이것은 무엇인가요?' },
-    { jp:'それ', read:'소레', ko:'그것', ex:'それをください — 그것을 주세요' },
-    { jp:'あれ', read:'아레', ko:'저것', ex:'あれは何ですか — 저것은 무엇인가요?' },
-    { jp:'ここ', read:'코코', ko:'여기', ex:'ここはどこ — 여기는 어디야?' },
-    { jp:'そこ', read:'소코', ko:'거기', ex:'そこに座って — 거기 앉아' },
-    { jp:'あそこ', read:'아소코', ko:'저기', ex:'あそこに行きたい — 저기 가고 싶다' },
+    { jp:'私', read:'와타시', ko:'나 / 저', ex:'私は学生です — 저는 학생입니다', reads:['わたし'] },
+    { jp:'僕', read:'보쿠', ko:'나 (남성 구어)', ex:'남자가 친근하게 쓸 때', reads:['ぼく'] },
+    { jp:'あなた', read:'아나타', ko:'당신 / 너', ex:'あなたの名前は？ — 당신 이름은?', reads:['あなた'] },
+    { jp:'彼', read:'카레', ko:'그 / 그 남자', ex:'彼は先生です — 그는 선생님입니다', reads:['かれ'] },
+    { jp:'彼女', read:'카노죠', ko:'그녀 / 여자친구', ex:'彼女は学生です — 그녀는 학생입니다', reads:['かのじょ'] },
+    { jp:'私たち', read:'와타시타치', ko:'우리', ex:'私たちは友達 — 우리는 친구', reads:['わたしたち'] },
+    { jp:'これ', read:'코레', ko:'이것', ex:'これは何ですか — 이것은 무엇인가요?', reads:['これ'] },
+    { jp:'それ', read:'소레', ko:'그것', ex:'それをください — 그것을 주세요', reads:['それ'] },
+    { jp:'あれ', read:'아레', ko:'저것', ex:'あれは何ですか — 저것은 무엇인가요?', reads:['あれ'] },
+    { jp:'ここ', read:'코코', ko:'여기', ex:'ここはどこ — 여기는 어디야?', reads:['ここ'] },
+    { jp:'そこ', read:'소코', ko:'거기', ex:'そこに座って — 거기 앉아', reads:['そこ'] },
+    { jp:'あそこ', read:'아소코', ko:'저기', ex:'あそこに行きたい — 저기 가고 싶다', reads:['あそこ'] },
   ],
   '요일시간': [
-    { jp:'月曜日', read:'게츠요우비', ko:'월요일', ex:'' },
-    { jp:'火曜日', read:'카요우비', ko:'화요일', ex:'' },
-    { jp:'水曜日', read:'스이요우비', ko:'수요일', ex:'' },
-    { jp:'木曜日', read:'모쿠요우비', ko:'목요일', ex:'' },
-    { jp:'金曜日', read:'킹요우비', ko:'금요일', ex:'' },
-    { jp:'土曜日', read:'도요우비', ko:'토요일', ex:'' },
-    { jp:'日曜日', read:'니치요우비', ko:'일요일', ex:'' },
-    { jp:'今日', read:'쿄우', ko:'오늘', ex:'今日は何曜日 — 오늘 무슨 요일?' },
-    { jp:'明日', read:'아시타', ko:'내일', ex:'明日また — 내일 또 봐요' },
-    { jp:'昨日', read:'키노우', ko:'어제', ex:'昨日何した — 어제 뭐 했어?' },
-    { jp:'今', read:'이마', ko:'지금', ex:'今何時ですか — 지금 몇 시예요?' },
-    { jp:'朝', read:'아사', ko:'아침', ex:'毎朝 — 매일 아침' },
-    { jp:'昼', read:'히루', ko:'낮', ex:'お昼ご飯 — 점심밥' },
-    { jp:'夜', read:'요루', ko:'밤', ex:'今夜 — 오늘 밤' },
+    { jp:'月曜日', read:'게츠요우비', ko:'월요일', ex:'', reads:['げつようび'] },
+    { jp:'火曜日', read:'카요우비', ko:'화요일', ex:'', reads:['かようび'] },
+    { jp:'水曜日', read:'스이요우비', ko:'수요일', ex:'', reads:['すいようび'] },
+    { jp:'木曜日', read:'모쿠요우비', ko:'목요일', ex:'', reads:['もくようび'] },
+    { jp:'金曜日', read:'킹요우비', ko:'금요일', ex:'', reads:['きんようび'] },
+    { jp:'土曜日', read:'도요우비', ko:'토요일', ex:'', reads:['どようび'] },
+    { jp:'日曜日', read:'니치요우비', ko:'일요일', ex:'', reads:['にちようび'] },
+    { jp:'今日', read:'쿄우', ko:'오늘', ex:'今日は何曜日 — 오늘 무슨 요일?', reads:['きょう'] },
+    { jp:'明日', read:'아시타', ko:'내일', ex:'明日また — 내일 또 봐요', reads:['あした'] },
+    { jp:'昨日', read:'키노우', ko:'어제', ex:'昨日何した — 어제 뭐 했어?', reads:['きのう'] },
+    { jp:'今', read:'이마', ko:'지금', ex:'今何時ですか — 지금 몇 시예요?', reads:['いま'] },
+    { jp:'朝', read:'아사', ko:'아침', ex:'毎朝 — 매일 아침', reads:['あさ'] },
+    { jp:'昼', read:'히루', ko:'낮', ex:'お昼ご飯 — 점심밥', reads:['ひる'] },
+    { jp:'夜', read:'요루', ko:'밤', ex:'今夜 — 오늘 밤', reads:['よる'] },
   ],
   '색깔': [
-    { jp:'赤', read:'아카', ko:'빨간색', ex:'赤いりんご — 빨간 사과' },
-    { jp:'青', read:'아오', ko:'파란색', ex:'青い空 — 파란 하늘' },
-    { jp:'白', read:'시로', ko:'흰색', ex:'白いシャツ — 흰 셔츠' },
-    { jp:'黒', read:'쿠로', ko:'검은색', ex:'黒い猫 — 검은 고양이' },
-    { jp:'黄色', read:'키이로', ko:'노란색', ex:'黄色い花 — 노란 꽃' },
-    { jp:'緑', read:'미도리', ko:'초록색', ex:'緑の木 — 초록 나무' },
-    { jp:'紫', read:'무라사키', ko:'보라색', ex:'紫の花 — 보라 꽃' },
-    { jp:'ピンク', read:'핑쿠', ko:'분홍색', ex:'ピンクのドレス — 분홍 드레스' },
-    { jp:'茶色', read:'챠이로', ko:'갈색', ex:'茶色い犬 — 갈색 개' },
+    { jp:'赤', read:'아카', ko:'빨간색', ex:'赤いりんご — 빨간 사과', reads:['あか'] },
+    { jp:'青', read:'아오', ko:'파란색', ex:'青い空 — 파란 하늘', reads:['あお'] },
+    { jp:'白', read:'시로', ko:'흰색', ex:'白いシャツ — 흰 셔츠', reads:['しろ'] },
+    { jp:'黒', read:'쿠로', ko:'검은색', ex:'黒い猫 — 검은 고양이', reads:['くろ'] },
+    { jp:'黄色', read:'키이로', ko:'노란색', ex:'黄色い花 — 노란 꽃', reads:['きいろ'] },
+    { jp:'緑', read:'미도리', ko:'초록색', ex:'緑の木 — 초록 나무', reads:['みどり'] },
+    { jp:'紫', read:'무라사키', ko:'보라색', ex:'紫の花 — 보라 꽃', reads:['むらさき'] },
+    { jp:'ピンク', read:'핑쿠', ko:'분홍색', ex:'ピンクのドレス — 분홍 드레스', reads:['ピンク'] },
+    { jp:'茶色', read:'챠이로', ko:'갈색', ex:'茶色い犬 — 갈색 개', reads:['ちゃいろ'] },
   ],
   '신체': [
-    { jp:'頭', read:'아타마', ko:'머리', ex:'頭が痛い — 머리가 아파요' },
-    { jp:'目', read:'메', ko:'눈', ex:'目が大きい — 눈이 크다' },
-    { jp:'耳', read:'미미', ko:'귀', ex:'耳が聞こえない — 귀가 안 들려요' },
-    { jp:'鼻', read:'하나', ko:'코', ex:'鼻が高い — 코가 높다' },
-    { jp:'口', read:'쿠치', ko:'입', ex:'口を開けて — 입을 열어요' },
-    { jp:'手', read:'테', ko:'손', ex:'手を洗って — 손을 씻어요' },
-    { jp:'足', read:'아시', ko:'발 / 다리', ex:'足が痛い — 다리가 아파요' },
-    { jp:'お腹', read:'오나카', ko:'배', ex:'お腹が空いた — 배가 고파요' },
+    { jp:'頭', read:'아타마', ko:'머리', ex:'頭が痛い — 머리가 아파요', reads:['あたま'] },
+    { jp:'目', read:'메', ko:'눈', ex:'目が大きい — 눈이 크다', reads:['め'] },
+    { jp:'耳', read:'미미', ko:'귀', ex:'耳が聞こえない — 귀가 안 들려요', reads:['みみ'] },
+    { jp:'鼻', read:'하나', ko:'코', ex:'鼻が高い — 코가 높다', reads:['はな'] },
+    { jp:'口', read:'쿠치', ko:'입', ex:'口を開けて — 입을 열어요', reads:['くち'] },
+    { jp:'手', read:'테', ko:'손', ex:'手を洗って — 손을 씻어요', reads:['て'] },
+    { jp:'足', read:'아시', ko:'발 / 다리', ex:'足が痛い — 다리가 아파요', reads:['あし'] },
+    { jp:'お腹', read:'오나카', ko:'배', ex:'お腹が空いた — 배가 고파요', reads:['おなか'] },
   ],
   '형용사': [
-    { jp:'大きい', read:'오오키이', ko:'크다', ex:'大きい家 — 큰 집' },
-    { jp:'小さい', read:'치이사이', ko:'작다', ex:'小さい犬 — 작은 강아지' },
-    { jp:'高い', read:'타카이', ko:'높다 / 비싸다', ex:'高いビル — 높은 빌딩' },
-    { jp:'速い', read:'하야이', ko:'빠르다', ex:'速い車 — 빠른 차' },
-    { jp:'新しい', read:'아타라시이', ko:'새롭다', ex:'新しい服 — 새 옷' },
-    { jp:'古い', read:'후루이', ko:'오래되다', ex:'古い建物 — 오래된 건물' },
-    { jp:'暑い', read:'아츠이', ko:'덥다', ex:'今日は暑い — 오늘은 덥다' },
-    { jp:'寒い', read:'사무이', ko:'춥다', ex:'冬は寒い — 겨울은 춥다' },
-    { jp:'楽しい', read:'타노시이', ko:'즐겁다', ex:'楽しい旅行 — 즐거운 여행' },
-    { jp:'難しい', read:'무즈카시이', ko:'어렵다', ex:'日本語は難しい — 일본어는 어렵다' },
+    { jp:'大きい', read:'오오키이', ko:'크다', ex:'大きい家 — 큰 집', reads:['おおきい'] },
+    { jp:'小さい', read:'치이사이', ko:'작다', ex:'小さい犬 — 작은 강아지', reads:['ちいさい'] },
+    { jp:'高い', read:'타카이', ko:'높다 / 비싸다', ex:'高いビル — 높은 빌딩', reads:['たかい'] },
+    { jp:'速い', read:'하야이', ko:'빠르다', ex:'速い車 — 빠른 차', reads:['はやい'] },
+    { jp:'新しい', read:'아타라시이', ko:'새롭다', ex:'新しい服 — 새 옷', reads:['あたらしい'] },
+    { jp:'古い', read:'후루이', ko:'오래되다', ex:'古い建物 — 오래된 건물', reads:['ふるい'] },
+    { jp:'暑い', read:'아츠이', ko:'덥다', ex:'今日は暑い — 오늘은 덥다', reads:['あつい'] },
+    { jp:'寒い', read:'사무이', ko:'춥다', ex:'冬は寒い — 겨울은 춥다', reads:['さむい'] },
+    { jp:'楽しい', read:'타노시이', ko:'즐겁다', ex:'楽しい旅行 — 즐거운 여행', reads:['たのしい'] },
+    { jp:'難しい', read:'무즈카시이', ko:'어렵다', ex:'日本語は難しい — 일본어는 어렵다', reads:['むずかしい'] },
   ],
 };
 
@@ -1157,38 +1157,29 @@ function renderVocab() {
     const card = document.createElement('div');
     card.className = 'phrase-card';
 
-    // 독음을 ' / ' 로 분리 (표시용)
+    // 표시용 독음 분리
     const readings = w.read.split(' / ').map(r => r.trim());
-    // TTS용 발음 — reads 배열이 있으면 사용, 없으면 jp 문자로
-    const ttsReadings = w.reads || null;
-    const multiRead = readings.length > 1;
+    // TTS용 히라가나 — reads 배열 필수
+    const ttsReadings = w.reads || readings.map(() => w.jp);
 
-    // 독음 HTML — 여러 개면 버튼으로, 하나면 텍스트로
-    const readHTML = multiRead
-      ? `<div class="read-btns">${readings.map((r, i) => `<button class="read-btn" data-idx="${i}">🔊 ${r}</button>`).join('')}</div>`
-      : `<span class="phrase-read">${readings[0]}</span>`;
+    // 모든 독음을 버튼으로 표시
+    const readHTML = `<div class="read-btns">${readings.map((r, i) =>
+      `<button class="read-btn" data-idx="${i}">🔊 ${r}</button>`
+    ).join('')}</div>`;
 
     card.innerHTML = `
-      <span class="phrase-speak">🔊</span>
       <span class="phrase-jp">${w.jp}</span>
       ${readHTML}
       <span class="phrase-ko">${w.ko}</span>
       ${w.ex ? `<span class="phrase-hint">📝 ${w.ex}</span>` : ''}`;
 
-    if (multiRead) {
-      // 독음 버튼 각각 클릭 → 해당 독음으로 발음
-      card.querySelectorAll('.read-btn').forEach((btn, i) => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          // reads 배열 있으면 해당 히라가나로, 없으면 jp 문자로
-          speak(ttsReadings ? ttsReadings[i] : w.jp);
-        });
+    // 독음 버튼 클릭 → 해당 히라가나로 발음
+    card.querySelectorAll('.read-btn').forEach((btn, i) => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        speak(ttsReadings[i]);
       });
-      // 카드 전체 클릭 → 첫 번째 독음
-      card.addEventListener('click', () => speak(ttsReadings ? ttsReadings[0] : w.jp));
-    } else {
-      card.addEventListener('click', () => speak(w.jp));
-    }
+    });
 
     content.appendChild(card);
   });
