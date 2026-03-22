@@ -1072,6 +1072,8 @@ async function speakAndWait(text) {
 }
 
 function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function speak(text) {
   if (!text) return;
   if (speakTimer) clearTimeout(speakTimer);
   speakTimer = setTimeout(async () => {
