@@ -935,13 +935,12 @@ function renderQuizQuestion() {
       btns.forEach(b => { b.disabled = true; if (b.textContent === item.rom) b.classList.add('correct'); });
       if (c.rom === item.rom) {
         quizScore++;
-        speak('正解です！');
+        speak('正解です！正解は' + item.h + 'です。');
       } else {
         el.querySelector(`[data-idx="${i}"]`).classList.add('wrong');
-        speak('惜しいです。');
+        speak('惜しいです。正解は' + item.h + 'です。');
       }
-      setTimeout(() => speak(item.h), 1000);
-      setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 2400);
+      setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 2800);
     });
   });
 }
