@@ -513,11 +513,13 @@
     min-height: 38px;
     border-radius: 14px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    transition: all 0.2s;
+    transition: transform 0.15s, box-shadow 0.2s, background 0.2s, color 0.2s;
     -webkit-user-select: none;
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
-  .cat-btn:active { transform: scale(0.95); }
+  .cat-btn:active, .cat-btn.pressing { transform: scale(0.95); }
   .cat-btn.active {
     background: var(--card-bg);
     color: var(--accent);
@@ -1270,6 +1272,7 @@ function renderConv() {
   catBar.innerHTML = cats.map(c => `<button class="cat-btn${c===currentCat?' active':''}" data-cat="${c}">${c}</button>`).join('');
   catBar.querySelectorAll('.cat-btn').forEach(btn => {
     btn.addEventListener('click', () => { currentCat = btn.dataset.cat; renderConv(); });
+    addPressEffect(btn);
   });
   const phrases = PHRASES[currentCat];
   const content = document.getElementById('convContent');
@@ -1373,6 +1376,7 @@ function renderVocab() {
   catBar.innerHTML = cats.map(c => `<button class="cat-btn${c===currentVocabCat?' active':''}" data-cat="${c}">${c}</button>`).join('');
   catBar.querySelectorAll('.cat-btn').forEach(btn => {
     btn.addEventListener('click', () => { currentVocabCat = btn.dataset.cat; renderVocab(); });
+    addPressEffect(btn);
   });
   const words = VOCAB[currentVocabCat];
   const content = document.getElementById('vocabContent');
@@ -1536,6 +1540,13 @@ async function loadiTunes() {
     </a>`).join('');
 }
 
+// ── PRESS EFFECT for dynamically created buttons ──
+function addPressEffect(el) {
+  el.addEventListener('touchstart', () => el.classList.add('pressing'), { passive: true });
+  el.addEventListener('touchend',   () => el.classList.remove('pressing'), { passive: true });
+  el.addEventListener('touchcancel',() => el.classList.remove('pressing'), { passive: true });
+}
+
 // ── TABS ──
 function switchTab(tab) {
   ['home','table','quiz','conv','vocab'].forEach(t => {
@@ -1550,7 +1561,10 @@ function switchTab(tab) {
   if (tab==='quiz')  startQuiz();
   if (tab==='conv')  renderConv();
   if (tab==='vocab') renderVocab();
-  if (tab==='home')  { loadNews(); loadiTunes(); }
+  if (tab==='home')  {
+    loadNews(); loadiTunes();
+    document.querySelectorAll('#itunesCatBar .cat-btn').forEach(addPressEffect);
+  }
   if (tab==='table') { currentScript = 'hira'; document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('active', i===0)); renderTable(); }
   if (synth) synth.cancel();
 }
