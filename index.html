@@ -1437,22 +1437,42 @@ async function loadiTunes() {
   const el = document.getElementById('itunesList');
   if (!el) return;
   el.innerHTML = '<div class="news-loading">⏳ 로딩 중...</div>';
-  try {
-    const res = await fetch(ITUNES_ENDPOINTS[currentItunesCat], { signal: AbortSignal.timeout(8000) });
-    const data = await res.json();
-    const items = data.feed.results;
-    el.innerHTML = items.map((item, i) => `
-      <a class="itunes-item" href="${item.url}" target="_blank" rel="noopener">
-        <span class="itunes-rank">${i + 1}</span>
-        <img class="itunes-thumb" src="${item.artworkUrl100}" alt="" onerror="this.style.display='none'">
-        <span class="itunes-info">
-          <span class="itunes-name">${item.name}</span>
-          <span class="itunes-artist">${item.artistName || item.genres?.[0]?.name || ''}</span>
-        </span>
-      </a>`).join('');
-  } catch(e) {
-    el.innerHTML = '<div class="news-error">불러오지 못했어요. 🔄 다시 시도해보세요.</div>';
+
+  const baseUrl = ITUNES_ENDPOINTS[currentItunesCat];
+  const PROXIES = [
+    `https://corsproxy.io/?${encodeURIComponent(baseUrl)}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(baseUrl)}`,
+  ];
+
+  let items = null;
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      const raw = text.trim().startsWith('{') && text.includes('contents')
+        ? JSON.parse(text).contents
+        : text;
+      const data = JSON.parse(raw);
+      items = data.feed?.results;
+      if (items?.length) break;
+    } catch(e) { continue; }
   }
+
+  if (!items?.length) {
+    el.innerHTML = '<div class="news-error">불러오지 못했어요. 🔄 다시 시도해보세요.</div>';
+    return;
+  }
+
+  el.innerHTML = items.map((item, i) => `
+    <a class="itunes-item" href="${item.url}" target="_blank" rel="noopener">
+      <span class="itunes-rank">${i + 1}</span>
+      <img class="itunes-thumb" src="${item.artworkUrl100}" alt="" onerror="this.style.display='none'">
+      <span class="itunes-info">
+        <span class="itunes-name">${item.name}</span>
+        <span class="itunes-artist">${item.artistName || item.genres?.[0]?.name || ''}</span>
+      </span>
+    </a>`).join('');
 }
 
 // ── TABS ──
