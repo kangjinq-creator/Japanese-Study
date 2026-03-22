@@ -65,7 +65,17 @@
     display: block;
     transition: opacity 0.15s;
   }
-  .header-avatar-wrap:active .header-avatar { opacity: 0.75; }
+  @keyframes popTap {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.22); }
+    100% { transform: scale(1); }
+  }
+  .header-avatar-wrap:active .header-avatar {
+    animation: popTap 0.25s ease-out;
+  }
+  .nav-btn:active .nav-icon img {
+    animation: popTap 0.25s ease-out;
+  }
   .header-avatar-badge {
     position: absolute;
     bottom: -2px; right: -2px;
