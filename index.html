@@ -476,13 +476,14 @@
   .speak-btn {
     margin-top: 20px;
     padding: 14px 36px;
-    border: 2px solid var(--ink);
-    background: var(--ink);
-    color: var(--paper);
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 1rem;
     cursor: pointer;
-    box-shadow: 4px 4px 0 var(--accent);
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(46,125,82,0.35);
     transition: all 0.12s;
     -webkit-user-select: none;
     user-select: none;
@@ -547,6 +548,9 @@
     user-select: none;
   }
   .phrase-card:active { background: #f0f9f4; transform: scale(0.99); }
+  /* 단어 카드는 카드 전체 클릭 효과 없음 — 독음 버튼에만 효과 */
+  .vocab-card { cursor: default; }
+  .vocab-card:active { background: var(--card-bg); transform: none; }
 
   .phrase-jp {
     font-family: 'Noto Serif JP', serif;
@@ -673,8 +677,8 @@
   }
   .test-btn:active { background: rgba(0,0,0,0.05); }
 
-  .speak-btn:active { transform: scale(0.97); }
-  .speak-btn.speaking { background: var(--accent); border-color: var(--accent); box-shadow: 4px 4px 0 var(--ink); }
+  .speak-btn:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(46,125,82,0.2); }
+  .speak-btn.speaking { background: var(--accent2); box-shadow: 0 4px 14px rgba(46,125,82,0.35); }
 
   /* 독음 버튼 (여러 독음) */
   .read-btns {
@@ -684,20 +688,28 @@
     margin-top: 4px;
   }
   .read-btn {
-    padding: 3px 10px;
-    border: 1.5px solid var(--muted);
-    background: transparent;
+    padding: 5px 12px;
+    border: none;
+    background: #ddeee3;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 0.72rem;
-    color: var(--muted);
+    color: var(--accent);
+    font-weight: 600;
     cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.15s;
+    border-radius: 20px;
+    box-shadow: 0 1px 4px rgba(46,125,82,0.15);
+    transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
     -webkit-user-select: none;
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
-
-  /* ── HOME VIEW ── */
+  .read-btn:active, .read-btn.pressing {
+    transform: scale(0.93);
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 1px 2px rgba(46,125,82,0.1);
+  }
   .home-view {
     max-width: 600px;
     margin: 0 auto;
@@ -1435,7 +1447,7 @@ function renderVocab() {
   content.innerHTML = `<div class="conv-section-title">${currentVocabCat} — ${words.length}개 단어</div>`;
   words.forEach(w => {
     const card = document.createElement('div');
-    card.className = 'phrase-card';
+    card.className = 'phrase-card vocab-card';
 
     // 표시용 독음 분리
     const readings = w.read.split(' / ').map(r => r.trim());
@@ -1459,6 +1471,7 @@ function renderVocab() {
         e.stopPropagation();
         speak(ttsReadings[i]);
       });
+      addPressEffect(btn);
     });
 
     content.appendChild(card);
