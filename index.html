@@ -605,6 +605,32 @@
 
   .speak-btn:active { transform: scale(0.97); }
   .speak-btn.speaking { background: var(--accent); border-color: var(--accent); box-shadow: 4px 4px 0 var(--ink); }
+
+  /* 독음 버튼 (여러 독음) */
+  .read-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .read-btn {
+    padding: 3px 10px;
+    border: 1.5px solid var(--muted);
+    background: transparent;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .read-btn:active {
+    background: rgba(192,57,43,0.08);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
@@ -1039,12 +1065,12 @@ const VOCAB = {
     { jp:'一', read:'이치', ko:'1', ex:'一つ (히토츠) — 하나' },
     { jp:'二', read:'니', ko:'2', ex:'二つ (후타츠) — 둘' },
     { jp:'三', read:'산', ko:'3', ex:'三つ (밋츠) — 셋' },
-    { jp:'四', read:'시 / 욘', ko:'4', ex:'四つ (욧츠) — 넷' },
+    { jp:'四', read:'시 / 욘', ko:'4', ex:'四つ (욧츠) — 넷', reads:['し','よん'] },
     { jp:'五', read:'고', ko:'5', ex:'五つ (이츠츠) — 다섯' },
     { jp:'六', read:'로쿠', ko:'6', ex:'六つ (뭇츠) — 여섯' },
-    { jp:'七', read:'시치 / 나나', ko:'7', ex:'七つ (나나츠) — 일곱' },
+    { jp:'七', read:'시치 / 나나', ko:'7', ex:'七つ (나나츠) — 일곱', reads:['しち','なな'] },
     { jp:'八', read:'하치', ko:'8', ex:'八つ (야츠) — 여덟' },
-    { jp:'九', read:'쿠 / 큐우', ko:'9', ex:'九つ (코코노츠) — 아홉' },
+    { jp:'九', read:'쿠 / 큐우', ko:'9', ex:'九つ (코코노츠) — 아홉', reads:['く','きゅう'] },
     { jp:'十', read:'쥬우', ko:'10', ex:'十 (토오) — 열' },
     { jp:'百', read:'햐쿠', ko:'100', ex:'百円 — 100엔' },
     { jp:'千', read:'센', ko:'1,000', ex:'千円 — 1000엔' },
@@ -1130,8 +1156,40 @@ function renderVocab() {
   words.forEach(w => {
     const card = document.createElement('div');
     card.className = 'phrase-card';
-    card.innerHTML = `<span class="phrase-speak">🔊</span><span class="phrase-jp">${w.jp}</span><span class="phrase-read">${w.read}</span><span class="phrase-ko">${w.ko}</span>${w.ex ? `<span class="phrase-hint">📝 ${w.ex}</span>` : ''}`;
-    card.addEventListener('click', () => speak(w.jp));
+
+    // 독음을 ' / ' 로 분리 (표시용)
+    const readings = w.read.split(' / ').map(r => r.trim());
+    // TTS용 발음 — reads 배열이 있으면 사용, 없으면 jp 문자로
+    const ttsReadings = w.reads || null;
+    const multiRead = readings.length > 1;
+
+    // 독음 HTML — 여러 개면 버튼으로, 하나면 텍스트로
+    const readHTML = multiRead
+      ? `<div class="read-btns">${readings.map((r, i) => `<button class="read-btn" data-idx="${i}">🔊 ${r}</button>`).join('')}</div>`
+      : `<span class="phrase-read">${readings[0]}</span>`;
+
+    card.innerHTML = `
+      <span class="phrase-speak">🔊</span>
+      <span class="phrase-jp">${w.jp}</span>
+      ${readHTML}
+      <span class="phrase-ko">${w.ko}</span>
+      ${w.ex ? `<span class="phrase-hint">📝 ${w.ex}</span>` : ''}`;
+
+    if (multiRead) {
+      // 독음 버튼 각각 클릭 → 해당 독음으로 발음
+      card.querySelectorAll('.read-btn').forEach((btn, i) => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          // reads 배열 있으면 해당 히라가나로, 없으면 jp 문자로
+          speak(ttsReadings ? ttsReadings[i] : w.jp);
+        });
+      });
+      // 카드 전체 클릭 → 첫 번째 독음
+      card.addEventListener('click', () => speak(ttsReadings ? ttsReadings[0] : w.jp));
+    } else {
+      card.addEventListener('click', () => speak(w.jp));
+    }
+
     content.appendChild(card);
   });
 }
