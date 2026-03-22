@@ -1311,10 +1311,11 @@ async function loadNews() {
   el.innerHTML = '<div class="news-loading">⏳ 뉴스를 불러오는 중...</div>';
 
   const RSS_URL = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
+  const bust = Date.now(); // 캐시 무력화용 타임스탬프
   const PROXIES = [
-    `https://corsproxy.io/?${encodeURIComponent(RSS_URL)}`,
-    `https://api.allorigins.win/get?url=${encodeURIComponent(RSS_URL)}`,
-    `https://thingproxy.freeboard.io/fetch/${RSS_URL}`,
+    `https://corsproxy.io/?${encodeURIComponent(RSS_URL + '?t=' + bust)}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(RSS_URL + '?t=' + bust)}&callback=`,
+    `https://thingproxy.freeboard.io/fetch/${RSS_URL}?t=${bust}`,
   ];
 
   let xml = null;
