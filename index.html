@@ -693,11 +693,18 @@
     <div class="settings-row">
       <span class="settings-label">🐢 읽기 속도</span>
       <div class="rate-row">
-        <input type="range" class="rate-slider" id="rateSlider" min="0.5" max="1.5" step="0.1" value="0.8" oninput="onRateChange(this.value)">
-        <span class="rate-val" id="rateVal">0.8</span>
+        <input type="range" class="rate-slider" id="rateSlider" min="0.5" max="1.5" step="0.05" value="0.85" oninput="onRateChange(this.value)">
+        <span class="rate-val" id="rateVal">0.85</span>
       </div>
     </div>
-    <button class="test-btn" onclick="testVoice()">🔊 테스트 — おはようございます</button>
+    <div class="settings-row">
+      <span class="settings-label">🎵 음높이 (피치)</span>
+      <div class="rate-row">
+        <input type="range" class="rate-slider" id="pitchSlider" min="-10" max="10" step="1" value="0" oninput="onPitchChange(this.value)">
+        <span class="rate-val" id="pitchVal">0.0</span>
+      </div>
+    </div>
+    <button class="test-btn" onclick="testVoice()">🔊 테스트 — おはようございます、元気ですか？</button>
   </div>
 </div>
 
@@ -733,60 +740,71 @@ let quizScript = 'hira';
 let quizItems = [], quizIndex = 0, quizScore = 0;
 const QUIZ_LEN = 15;
 
-// ── SPEECH ──
+// ── GOOGLE CLOUD TTS ──
+const GCLOUD_KEY = 'AIzaSyAbmm_l98oAoarx996zKG7MkqXXsViKCuc';
+let speakRate = 0.85;
+let speakPitch = 0.0;
 let currentKana = '';
-const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
-let jpVoice = null, speakTimer = null, speakRate = 0.8;
+let speakTimer = null;
+let audioEl = null;
+let selectedVoice = 'ja-JP-Neural2-B'; // 기본: 고품질 여성
 
-function loadVoices() {
-  if (!synth) return;
-  const v = synth.getVoices();
-  const jpVoices = v.filter(x => x.lang === 'ja-JP' || x.lang.startsWith('ja'));
+// 음성 목록 (Google Cloud TTS 일본어)
+const GCLOUD_VOICES = [
+  { name:'ja-JP-Neural2-B',   label:'Neural2 - 여성 A',   gender:'여성' },
+  { name:'ja-JP-Neural2-C',   label:'Neural2 - 남성 A',   gender:'남성' },
+  { name:'ja-JP-Neural2-D',   label:'Neural2 - 남성 B',   gender:'남성' },
+  { name:'ja-JP-Wavenet-A',   label:'Wavenet - 여성 A',   gender:'여성' },
+  { name:'ja-JP-Wavenet-B',   label:'Wavenet - 여성 B',   gender:'여성' },
+  { name:'ja-JP-Wavenet-C',   label:'Wavenet - 남성 A',   gender:'남성' },
+  { name:'ja-JP-Wavenet-D',   label:'Wavenet - 남성 B',   gender:'남성' },
+  { name:'ja-JP-Standard-A',  label:'Standard - 여성 A',  gender:'여성' },
+  { name:'ja-JP-Standard-B',  label:'Standard - 여성 B',  gender:'여성' },
+  { name:'ja-JP-Standard-C',  label:'Standard - 남성 A',  gender:'남성' },
+  { name:'ja-JP-Standard-D',  label:'Standard - 남성 B',  gender:'남성' },
+  { name:'ja-JP-Chirp3-HD-Aoede',       label:'Chirp3 HD - Aoede (여성)',     gender:'여성' },
+  { name:'ja-JP-Chirp3-HD-Achernar',    label:'Chirp3 HD - Achernar (여성)',  gender:'여성' },
+  { name:'ja-JP-Chirp3-HD-Kore',        label:'Chirp3 HD - Kore (여성)',      gender:'여성' },
+  { name:'ja-JP-Chirp3-HD-Zephyr',      label:'Chirp3 HD - Zephyr (여성)',    gender:'여성' },
+  { name:'ja-JP-Chirp3-HD-Charon',      label:'Chirp3 HD - Charon (남성)',    gender:'남성' },
+  { name:'ja-JP-Chirp3-HD-Fenrir',      label:'Chirp3 HD - Fenrir (남성)',    gender:'남성' },
+  { name:'ja-JP-Chirp3-HD-Puck',        label:'Chirp3 HD - Puck (남성)',      gender:'남성' },
+  { name:'ja-JP-Chirp3-HD-Orus',        label:'Chirp3 HD - Orus (남성)',      gender:'남성' },
+];
 
-  // 기본 음성 설정 (처음 로드 시)
-  if (!jpVoice) {
-    jpVoice = jpVoices.find(x => !x.name.toLowerCase().includes('english')) || jpVoices[0] || null;
-  }
-
-  // 드롭다운 채우기
-  const sel = document.getElementById('voiceSelect');
-  if (!sel) return;
-  const prev = sel.value;
-  sel.innerHTML = '';
-
-  if (jpVoices.length === 0) {
-    sel.innerHTML = '<option value="">일본어 음성 없음 (기기에 설치 필요)</option>';
-    return;
-  }
-  jpVoices.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v.name;
-    opt.textContent = `${v.name} (${v.lang})`;
-    if (jpVoice && v.name === jpVoice.name) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  if (prev) sel.value = prev;
-}
-if (synth) {
-  loadVoices();
-  if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
-}
-
-function speak(text) {
-  if (!synth || !text) return;
+async function speak(text) {
+  if (!text) return;
   if (speakTimer) clearTimeout(speakTimer);
-  speakTimer = setTimeout(() => {
+  speakTimer = setTimeout(async () => {
     try {
-      synth.cancel();
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = 'ja-JP';
-      if (jpVoice) utt.voice = jpVoice;
-      utt.rate = speakRate; utt.pitch = 1.0; utt.volume = 1.0;
       const btn = document.getElementById('speakBtn');
       if (btn) { btn.classList.add('speaking'); btn.textContent = '🔊 재생 중...'; }
-      utt.onend = utt.onerror = () => { if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 듣기'; } };
-      synth.speak(utt);
-    } catch(e) {}
+
+      const res = await fetch(
+        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GCLOUD_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input: { text },
+            voice: { languageCode: 'ja-JP', name: selectedVoice },
+            audioConfig: { audioEncoding: 'MP3', speakingRate: speakRate, pitch: speakPitch }
+          })
+        }
+      );
+      const data = await res.json();
+      if (!data.audioContent) throw new Error('no audio');
+
+      if (audioEl) { audioEl.pause(); audioEl = null; }
+      audioEl = new Audio('data:audio/mp3;base64,' + data.audioContent);
+      audioEl.onended = () => { if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 듣기'; } };
+      audioEl.onerror = () => { if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 듣기'; } };
+      audioEl.play();
+    } catch(e) {
+      console.warn('TTS error', e);
+      const btn = document.getElementById('speakBtn');
+      if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 듣기'; }
+    }
     speakTimer = null;
   }, 80);
 }
@@ -795,9 +813,15 @@ function speakCurrent() { speak(currentKana); }
 
 // ── SETTINGS ──
 function openSettings() {
-  loadVoices(); // 최신 음성 목록 갱신
+  // 음성 드롭다운 채우기
+  const sel = document.getElementById('voiceSelect');
+  sel.innerHTML = GCLOUD_VOICES.map(v =>
+    `<option value="${v.name}" ${v.name === selectedVoice ? 'selected' : ''}>${v.label}</option>`
+  ).join('');
   document.getElementById('rateSlider').value = speakRate;
-  document.getElementById('rateVal').textContent = speakRate;
+  document.getElementById('rateVal').textContent = speakRate.toFixed(1);
+  document.getElementById('pitchSlider').value = speakPitch;
+  document.getElementById('pitchVal').textContent = speakPitch.toFixed(1);
   document.getElementById('settingsOverlay').classList.add('open');
 }
 function closeSettings(e) {
@@ -806,15 +830,17 @@ function closeSettings(e) {
   }
 }
 function onVoiceChange() {
-  const sel = document.getElementById('voiceSelect');
-  const voices = synth ? synth.getVoices() : [];
-  jpVoice = voices.find(v => v.name === sel.value) || null;
+  selectedVoice = document.getElementById('voiceSelect').value;
 }
 function onRateChange(val) {
   speakRate = parseFloat(val);
   document.getElementById('rateVal').textContent = speakRate.toFixed(1);
 }
-function testVoice() { speak('おはようございます'); }
+function onPitchChange(val) {
+  speakPitch = parseFloat(val);
+  document.getElementById('pitchVal').textContent = speakPitch.toFixed(1);
+}
+function testVoice() { speak('おはようございます、元気ですか？'); }
 
 // ── TABLE ──
 function setScript(s) {
