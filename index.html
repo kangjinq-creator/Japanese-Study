@@ -1353,33 +1353,24 @@ async function loadNews() {
     </a>`;
   }).join('');
 
-  // Claude API로 번역
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: '아래 일본어 뉴스 제목 목록을 자연스러운 한국어로 번역해줘. JSON 배열로만 응답해. 예: ["번역1","번역2"]',
-        messages: [{ role: 'user', content: JSON.stringify(titles) }]
-      })
-    });
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '[]';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const translations = JSON.parse(clean);
-    translations.forEach((t, i) => {
-      const el = document.getElementById(`trans-${i}`);
-      if (el) el.textContent = t;
-    });
-  } catch(e) {
-    // 번역 실패 시 조용히 숨김
-    titles.forEach((_, i) => {
-      const el = document.getElementById(`trans-${i}`);
-      if (el) el.style.display = 'none';
-    });
-  }
+  // MyMemory 무료 번역 API로 각 제목 번역 (CORS 없음)
+  const translateOne = async (text) => {
+    try {
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ja|ko`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      const data = await res.json();
+      return data.responseData?.translatedText || null;
+    } catch(e) { return null; }
+  };
+
+  // 병렬 번역
+  const translations = await Promise.all(titles.map(t => translateOne(t)));
+  translations.forEach((t, i) => {
+    const el = document.getElementById(`trans-${i}`);
+    if (!el) return;
+    if (t) { el.textContent = t; }
+    else { el.style.display = 'none'; }
+  });
 }
 
 // ── TABS ──
