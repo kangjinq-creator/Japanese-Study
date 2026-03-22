@@ -647,10 +647,9 @@
     position: relative;
     width: 100%;
     padding-top: 56.25%;
-    border: 2px solid var(--ink);
-    box-shadow: 4px 4px 0 var(--ink);
     background: #000;
     overflow: hidden;
+    border-radius: 4px;
   }
   .yt-wrap iframe {
     position: absolute;
@@ -664,6 +663,65 @@
     margin-top: 12px;
     line-height: 1.6;
     font-weight: 300;
+  }
+
+
+  /* ── NEWS ── */
+  .news-section-title {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 5px;
+    margin: 24px 0 12px;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .news-refresh {
+    background: none; border: none;
+    font-size: 0.75rem; color: var(--muted);
+    cursor: pointer; padding: 2px 6px;
+  }
+  .news-item {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(0,0,0,0.1);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.12s;
+    text-decoration: none;
+    display: block;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .news-item:active { background: #fff0e8; border-color: var(--accent); }
+  .news-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    display: block;
+    line-height: 1.5;
+  }
+  .news-date {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 4px;
+    display: block;
+  }
+  .news-loading {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 20px 0;
+  }
+  .news-error {
+    text-align: center;
+    color: var(--accent);
+    font-size: 0.78rem;
+    padding: 16px 0;
   }
 
   .read-btn:active {
@@ -716,7 +774,11 @@
       allowfullscreen>
     </iframe>
   </div>
-  <p class="yt-desc">📺 일본어 학습에 도움이 되는 영상이에요. 즐겁게 시청하세요!</p>
+  <div class="news-section-title">
+    📰 今日のニュース — 오늘의 일본 뉴스
+    <button class="news-refresh" onclick="loadNews()" title="새로고침">🔄 새로고침</button>
+  </div>
+  <div id="newsList"><div class="news-loading">뉴스를 불러오는 중...</div></div>
 </div>
 
 <!-- TABLE VIEW -->
@@ -1242,6 +1304,43 @@ function renderVocab() {
   });
 }
 
+// ── NEWS ──
+async function loadNews() {
+  const el = document.getElementById('newsList');
+  if (!el) return;
+  el.innerHTML = '<div class="news-loading">⏳ 뉴스를 불러오는 중...</div>';
+
+  try {
+    // NHK Web Easy RSS (쉬운 일본어 뉴스)
+    const RSS_URL = 'https://www3.nhk.or.jp/rss/news/cat0.xml';
+    const PROXY   = 'https://api.allorigins.win/get?url=' + encodeURIComponent(RSS_URL);
+
+    const res  = await fetch(PROXY);
+    const data = await res.json();
+    const parser = new DOMParser();
+    const xml  = parser.parseFromString(data.contents, 'text/xml');
+    const items = Array.from(xml.querySelectorAll('item')).slice(0, 10);
+
+    if (!items.length) throw new Error('no items');
+
+    el.innerHTML = items.map(item => {
+      const title = item.querySelector('title')?.textContent || '';
+      const link  = item.querySelector('link')?.textContent || '#';
+      const pub   = item.querySelector('pubDate')?.textContent || '';
+      const date  = pub ? new Date(pub).toLocaleString('ja-JP', {
+        month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'
+      }) : '';
+      return `<a class="news-item" href="${link}" target="_blank" rel="noopener">
+        <span class="news-jp">${title}</span>
+        ${date ? `<span class="news-date">📅 ${date}</span>` : ''}
+      </a>`;
+    }).join('');
+
+  } catch(e) {
+    el.innerHTML = '<div class="news-error">뉴스를 불러오지 못했어요.<br>인터넷 연결을 확인하거나 🔄 새로고침을 눌러주세요.</div>';
+  }
+}
+
 // ── TABS ──
 function switchTab(tab) {
   ['home','table','quiz','conv','vocab'].forEach(t => {
@@ -1256,6 +1355,7 @@ function switchTab(tab) {
   if (tab==='quiz')  startQuiz();
   if (tab==='conv')  renderConv();
   if (tab==='vocab') renderVocab();
+  if (tab==='home')  loadNews();
   if (synth) synth.cancel();
 }
 
