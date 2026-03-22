@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f5f0e8">
+<title>かな 학습</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+KR:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --paper: #f5f0e8;
+    --accent: #c0392b;
+    --gold: #d4a017;
+    --muted: #8b7355;
+    --card-bg: #fdfaf4;
+    --nav-h: 64px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,0,0,0.04) 39px, rgba(0,0,0,0.04) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,0,0,0.04) 39px, rgba(0,0,0,0.04) 40px);
+    background-size: 40px 40px;
+    padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 20px 20px 14px;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+  }
+
+  header::before {
+    content: '文字';
+    position: absolute;
+    top: 6px; left: 16px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 36px;
+    color: rgba(0,0,0,0.06);
+    font-weight: 700;
+  }
+
+  header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.75rem;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: calc(var(--nav-h) + var(--safe-bottom));
+    background: var(--card-bg);
+    border-top: 2px solid var(--ink);
+    display: flex;
+    z-index: 50;
+    padding-bottom: var(--safe-bottom);
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 400;
+    transition: color 0.2s;
+    padding: 10px 0 6px;
+  }
+  .nav-btn .nav-icon {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn.active .nav-icon { font-weight: 700; }
+
+  /* ── MODE BAR ── */
+  .mode-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px 8px;
+    max-width: 900px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    padding: 8px 16px;
+    border: 1.5px solid var(--muted);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.78rem;
+    color: var(--muted);
+    border-radius: 2px;
+    transition: all 0.2s;
+    min-height: 40px;
+    min-width: 80px;
+  }
+  .mode-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(192,57,43,0.06);
+  }
+
+  /* ── TABLE VIEW ── */
+  .table-view {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 12px calc(var(--nav-h) + var(--safe-bottom) + 24px);
+  }
+
+  .row-label {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 2px 0 5px;
+    letter-spacing: 0.08em;
+  }
+
+  .kana-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 3px;
+  }
+
+  .kana-card {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(0,0,0,0.1);
+    padding: 12px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+    min-height: 68px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .kana-card:active {
+    background: #fff0e8;
+    border-color: var(--accent);
+    transform: scale(0.96);
+  }
+
+  .kana-char {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.4rem;
+    display: block;
+    line-height: 1.2;
+  }
+  .kana-rom {
+    font-size: 0.58rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+    display: block;
+  }
+  .kana-kata {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-top: 1px;
+    display: block;
+    line-height: 1.2;
+  }
+  .kana-card.empty {
+    background: transparent;
+    border: 1.5px dashed rgba(0,0,0,0.08);
+    box-shadow: none;
+    cursor: default;
+  }
+  .kana-card.empty:active { transform: none; background: transparent; border-color: rgba(0,0,0,0.08); }
+
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 5px;
+    margin: 20px 0 8px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── POPUP (bottom sheet on mobile) ── */
+  .popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20,16,10,0.5);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .popup-overlay.open { display: flex; }
+
+  .popup {
+    background: var(--card-bg);
+    border: 2px solid var(--ink);
+    border-bottom: none;
+    padding: 32px 50px calc(24px + var(--safe-bottom));
+    text-align: center;
+    box-shadow: 0 -6px 0 var(--ink);
+    width: 100%;
+    max-width: 480px;
+    position: relative;
+    animation: slideUp 0.22s ease;
+    border-radius: 0;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+
+  .popup-kana {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 5rem;
+    line-height: 1;
+    display: block;
+  }
+  .popup-alt {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 4px;
+  }
+  .popup-rom {
+    font-size: 1.6rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-top: 14px;
+    font-weight: 600;
+  }
+  .popup-close {
+    position: absolute;
+    top: 14px; right: 18px;
+    background: none; border: none;
+    font-size: 1.4rem; cursor: pointer;
+    color: var(--muted);
+    padding: 8px;
+    line-height: 1;
+  }
+  .popup-drag {
+    width: 36px; height: 4px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  /* ── QUIZ VIEW ── */
+  .quiz-view {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 12px 16px calc(var(--nav-h) + var(--safe-bottom) + 24px);
+    display: none;
+  }
+
+  .quiz-progress {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+  }
+  .progress-dot {
+    flex: 1; height: 4px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 0;
+  }
+  .progress-dot.done { background: var(--accent); }
+  .progress-dot.current { background: var(--gold); }
+
+  .quiz-card {
+    background: var(--card-bg);
+    border: 2px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+    padding: 40px 20px 32px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .quiz-prompt {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 5.5rem;
+    line-height: 1;
+  }
+
+  .quiz-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 10px;
+    font-weight: 300;
+  }
+
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .choice-btn {
+    padding: 20px 10px;
+    border: 2px solid var(--ink);
+    background: var(--card-bg);
+    cursor: pointer;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    color: var(--ink);
+    transition: background 0.12s;
+    letter-spacing: 0.1em;
+    box-shadow: 3px 3px 0 var(--ink);
+    min-height: 64px;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .choice-btn:active:not(:disabled) { transform: scale(0.97); }
+  .choice-btn.correct { background: #e8f5e9; border-color: #2e7d32; box-shadow: 3px 3px 0 #2e7d32; color: #2e7d32; }
+  .choice-btn.wrong   { background: #fdecea; border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); color: var(--accent); }
+  .choice-btn:disabled { cursor: default; }
+
+  .quiz-result {
+    text-align: center;
+    padding: 40px 20px;
+    display: none;
+  }
+  .result-score {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 3.5rem;
+    color: var(--accent);
+    display: block;
+  }
+  .result-msg {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin: 10px 0 24px;
+  }
+  .restart-btn {
+    padding: 16px 40px;
+    border: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.9rem;
+    box-shadow: 4px 4px 0 var(--accent);
+    transition: all 0.15s;
+  }
+  .restart-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--accent); }
+
+  .quiz-type-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+  }
+  .qtype-btn {
+    padding: 10px 18px;
+    border: 1.5px solid var(--muted);
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: all 0.2s;
+    min-height: 44px;
+  }
+  .speak-btn {
+    margin-top: 20px;
+    padding: 14px 36px;
+    border: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--accent);
+    transition: all 0.12s;
+    -webkit-user-select: none;
+    user-select: none;
+    display: block;
+    width: 100%;
+  }
+  /* ── CONVERSATION VIEW ── */
+  .conv-view {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 12px 16px calc(var(--nav-h) + var(--safe-bottom) + 24px);
+    display: none;
+  }
+
+  .conv-category-bar {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 8px 0 12px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .conv-category-bar::-webkit-scrollbar { display: none; }
+
+  .cat-btn {
+    padding: 8px 16px;
+    border: 1.5px solid var(--muted);
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 40px;
+    transition: all 0.2s;
+  }
+  .cat-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(192,57,43,0.06); }
+
+  .phrase-card {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(0,0,0,0.1);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.07);
+    margin-bottom: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.12s;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .phrase-card:active { background: #fff0e8; border-color: var(--accent); }
+
+  .phrase-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.25rem;
+    color: var(--ink);
+    display: block;
+    line-height: 1.4;
+  }
+  .phrase-read {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 3px;
+    display: block;
+    letter-spacing: 0.04em;
+  }
+  .phrase-ko {
+    font-size: 0.88rem;
+    color: var(--ink);
+    margin-top: 8px;
+    display: block;
+    font-weight: 600;
+    border-top: 1px solid rgba(0,0,0,0.07);
+    padding-top: 8px;
+  }
+  .phrase-hint {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 4px;
+    display: block;
+    font-weight: 300;
+  }
+  .phrase-speak {
+    float: right;
+    font-size: 1.1rem;
+    margin-top: -2px;
+    color: var(--muted);
+  }
+
+  .conv-section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 5px;
+    margin: 20px 0 10px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── SETTINGS ── */
+  .settings-btn {
+    position: absolute;
+    top: 50%; right: 16px;
+    transform: translateY(-50%);
+    background: none; border: none;
+    font-size: 1.3rem; cursor: pointer;
+    color: var(--muted); padding: 8px;
+    line-height: 1;
+  }
+
+  .settings-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(20,16,10,0.5);
+    z-index: 100; align-items: flex-end; justify-content: center;
+  }
+  .settings-overlay.open { display: flex; }
+
+  .settings-panel {
+    background: var(--card-bg);
+    border: 2px solid var(--ink); border-bottom: none;
+    box-shadow: 0 -6px 0 var(--ink);
+    width: 100%; max-width: 480px;
+    padding: 24px 24px calc(20px + var(--safe-bottom));
+    animation: slideUp 0.22s ease;
+  }
+
+  .settings-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1rem; font-weight: 700;
+    margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .settings-close {
+    background: none; border: none;
+    font-size: 1.2rem; cursor: pointer; color: var(--muted); padding: 4px;
+  }
+
+  .settings-row { margin-bottom: 18px; }
+  .settings-label {
+    font-size: 0.75rem; color: var(--muted);
+    display: block; margin-bottom: 6px; letter-spacing: 0.06em;
+  }
+
+  .voice-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--ink);
+    background: var(--paper);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b7355' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    cursor: pointer;
+  }
+
+  .rate-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .rate-slider {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; background: rgba(0,0,0,0.15); outline: none; border-radius: 0;
+  }
+  .rate-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 18px; height: 18px;
+    background: var(--ink); border-radius: 0; cursor: pointer;
+  }
+  .rate-val {
+    font-size: 0.8rem; color: var(--muted); min-width: 28px; text-align: right;
+  }
+
+  .test-btn {
+    width: 100%; padding: 12px;
+    border: 1.5px solid var(--muted);
+    background: transparent; cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.85rem; color: var(--muted);
+    transition: all 0.15s;
+  }
+  .test-btn:active { background: rgba(0,0,0,0.05); }
+
+  .speak-btn:active { transform: scale(0.97); }
+  .speak-btn.speaking { background: var(--accent); border-color: var(--accent); box-shadow: 4px 4px 0 var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>かな・カナ 학습</h1>
+  <p>히라가나 · 가타카나 · 일상 회화</p>
+  <button class="settings-btn" onclick="openSettings()" title="설정">⚙️</button>
+</header>
+
+<div class="bottom-nav">
+  <button class="nav-btn active" id="navTable" onclick="switchTab('table')">
+    <span class="nav-icon">あ</span>
+    문자
+  </button>
+  <button class="nav-btn" id="navVocab" onclick="switchTab('vocab')">
+    <span class="nav-icon">語</span>
+    단어
+  </button>
+  <button class="nav-btn" id="navConv" onclick="switchTab('conv')">
+    <span class="nav-icon">会</span>
+    회화
+  </button>
+  <button class="nav-btn" id="navQuiz" onclick="switchTab('quiz')">
+    <span class="nav-icon">？</span>
+    퀴즈
+  </button>
+</div>
+
+<!-- TABLE VIEW -->
+<div class="table-view" id="tableView">
+  <div class="mode-bar">
+    <button class="mode-btn active" onclick="setScript('hira')">히라가나 (平仮名)</button>
+    <button class="mode-btn" onclick="setScript('kata')">가타카나 (片仮名)</button>
+    <button class="mode-btn" onclick="setScript('both')">비교</button>
+  </div>
+  <div id="tableContent"></div>
+</div>
+
+<!-- QUIZ VIEW -->
+<div class="quiz-view" id="quizView">
+  <div class="quiz-type-bar">
+    <button class="qtype-btn active" onclick="setQuizScript('hira')">히라가나</button>
+    <button class="qtype-btn" onclick="setQuizScript('kata')">가타카나</button>
+    <button class="qtype-btn" onclick="setQuizScript('both')">혼합</button>
+  </div>
+  <div class="quiz-progress" id="quizProgress"></div>
+  <div id="quizContent"></div>
+  <div class="quiz-result" id="quizResult">
+    <span class="result-score" id="resultScore"></span>
+    <p class="result-msg" id="resultMsg"></p>
+    <button class="restart-btn" onclick="startQuiz()">다시 도전</button>
+  </div>
+</div>
+
+<!-- CONVERSATION VIEW -->
+<div class="conv-view" id="convView">
+  <div class="conv-category-bar" id="convCatBar"></div>
+  <div id="convContent"></div>
+</div>
+
+<!-- VOCAB VIEW -->
+<div class="conv-view" id="vocabView">
+  <div class="conv-category-bar" id="vocabCatBar"></div>
+  <div id="vocabContent"></div>
+</div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+  <div class="popup">
+    <div class="popup-drag"></div>
+    <button class="popup-close" onclick="closePopup()">✕</button>
+    <span class="popup-kana" id="popupKana"></span>
+    <span class="popup-alt" id="popupAlt"></span>
+    <div class="popup-rom" id="popupRom"></div>
+    <button class="speak-btn" id="speakBtn" onclick="speakCurrent()">🔊 듣기</button>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettings(event)">
+  <div class="settings-panel">
+    <div class="settings-title">
+      음성 설정
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">🎤 음성 선택</span>
+      <select class="voice-select" id="voiceSelect" onchange="onVoiceChange()"></select>
+    </div>
+    <div class="settings-row">
+      <span class="settings-label">🐢 읽기 속도</span>
+      <div class="rate-row">
+        <input type="range" class="rate-slider" id="rateSlider" min="0.5" max="1.5" step="0.1" value="0.8" oninput="onRateChange(this.value)">
+        <span class="rate-val" id="rateVal">0.8</span>
+      </div>
+    </div>
+    <button class="test-btn" onclick="testVoice()">🔊 테스트 — おはようございます</button>
+  </div>
+</div>
+
+<script>
+const KANA = {
+  basic: [
+    { rom:'a',  h:'あ', k:'ア' }, { rom:'i',  h:'い', k:'イ' }, { rom:'u',  h:'う', k:'ウ' }, { rom:'e',  h:'え', k:'エ' }, { rom:'o',  h:'お', k:'オ' },
+    { rom:'ka', h:'か', k:'カ' }, { rom:'ki', h:'き', k:'キ' }, { rom:'ku', h:'く', k:'ク' }, { rom:'ke', h:'け', k:'ケ' }, { rom:'ko', h:'こ', k:'コ' },
+    { rom:'sa', h:'さ', k:'サ' }, { rom:'shi',h:'し', k:'シ' }, { rom:'su', h:'す', k:'ス' }, { rom:'se', h:'せ', k:'セ' }, { rom:'so', h:'そ', k:'ソ' },
+    { rom:'ta', h:'た', k:'タ' }, { rom:'chi',h:'ち', k:'チ' }, { rom:'tsu',h:'つ', k:'ツ' }, { rom:'te', h:'て', k:'テ' }, { rom:'to', h:'と', k:'ト' },
+    { rom:'na', h:'な', k:'ナ' }, { rom:'ni', h:'に', k:'ニ' }, { rom:'nu', h:'ぬ', k:'ヌ' }, { rom:'ne', h:'ね', k:'ネ' }, { rom:'no', h:'の', k:'ノ' },
+    { rom:'ha', h:'は', k:'ハ' }, { rom:'hi', h:'ひ', k:'ヒ' }, { rom:'fu', h:'ふ', k:'フ' }, { rom:'he', h:'へ', k:'ヘ' }, { rom:'ho', h:'ほ', k:'ホ' },
+    { rom:'ma', h:'ま', k:'マ' }, { rom:'mi', h:'み', k:'ミ' }, { rom:'mu', h:'む', k:'ム' }, { rom:'me', h:'め', k:'メ' }, { rom:'mo', h:'も', k:'モ' },
+    { rom:'ya', h:'や', k:'ヤ' }, { rom:'—',  h:'',  k:''  }, { rom:'yu', h:'ゆ', k:'ユ' }, { rom:'—',  h:'',  k:''  }, { rom:'yo', h:'よ', k:'ヨ' },
+    { rom:'ra', h:'ら', k:'ラ' }, { rom:'ri', h:'り', k:'リ' }, { rom:'ru', h:'る', k:'ル' }, { rom:'re', h:'れ', k:'レ' }, { rom:'ro', h:'ろ', k:'ロ' },
+    { rom:'wa', h:'わ', k:'ワ' }, { rom:'—',  h:'',  k:''  }, { rom:'—',  h:'',  k:''  }, { rom:'—',  h:'',  k:''  }, { rom:'wo', h:'を', k:'ヲ' },
+    { rom:'n',  h:'ん', k:'ン' }, { rom:'—',  h:'',  k:''  }, { rom:'—',  h:'',  k:''  }, { rom:'—',  h:'',  k:''  }, { rom:'—',  h:'',  k:''  },
+  ],
+  dakuten: [
+    { rom:'ga', h:'が', k:'ガ' }, { rom:'gi', h:'ぎ', k:'ギ' }, { rom:'gu', h:'ぐ', k:'グ' }, { rom:'ge', h:'げ', k:'ゲ' }, { rom:'go', h:'ご', k:'ゴ' },
+    { rom:'za', h:'ざ', k:'ザ' }, { rom:'ji', h:'じ', k:'ジ' }, { rom:'zu', h:'ず', k:'ズ' }, { rom:'ze', h:'ぜ', k:'ゼ' }, { rom:'zo', h:'ぞ', k:'ゾ' },
+    { rom:'da', h:'だ', k:'ダ' }, { rom:'di', h:'ぢ', k:'ヂ' }, { rom:'du', h:'づ', k:'ヅ' }, { rom:'de', h:'で', k:'デ' }, { rom:'do', h:'ど', k:'ド' },
+    { rom:'ba', h:'ば', k:'バ' }, { rom:'bi', h:'び', k:'ビ' }, { rom:'bu', h:'ぶ', k:'ブ' }, { rom:'be', h:'べ', k:'ベ' }, { rom:'bo', h:'ぼ', k:'ボ' },
+    { rom:'pa', h:'ぱ', k:'パ' }, { rom:'pi', h:'ぴ', k:'ピ' }, { rom:'pu', h:'ぷ', k:'プ' }, { rom:'pe', h:'ぺ', k:'ペ' }, { rom:'po', h:'ぽ', k:'ポ' },
+  ],
+};
+
+const ROW_LABELS = ['あ단 (a)', 'か단 (ka)', 'さ단 (sa)', 'た단 (ta)', 'な단 (na)', 'は단 (ha)', 'ま단 (ma)', 'や단 (ya)', 'ら단 (ra)', 'わ단 (wa)', 'ん (n)'];
+const DAK_LABELS = ['が단 (ga)', 'ざ단 (za)', 'だ단 (da)', 'ば단 (ba)', 'ぱ단 (pa)'];
+
+let currentScript = 'hira';
+let quizScript = 'hira';
+let quizItems = [], quizIndex = 0, quizScore = 0;
+const QUIZ_LEN = 15;
+
+// ── SPEECH ──
+let currentKana = '';
+const synth = ('speechSynthesis' in window) ? window.speechSynthesis : null;
+let jpVoice = null, speakTimer = null, speakRate = 0.8;
+
+function loadVoices() {
+  if (!synth) return;
+  const v = synth.getVoices();
+  const jpVoices = v.filter(x => x.lang === 'ja-JP' || x.lang.startsWith('ja'));
+
+  // 기본 음성 설정 (처음 로드 시)
+  if (!jpVoice) {
+    jpVoice = jpVoices.find(x => !x.name.toLowerCase().includes('english')) || jpVoices[0] || null;
+  }
+
+  // 드롭다운 채우기
+  const sel = document.getElementById('voiceSelect');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '';
+
+  if (jpVoices.length === 0) {
+    sel.innerHTML = '<option value="">일본어 음성 없음 (기기에 설치 필요)</option>';
+    return;
+  }
+  jpVoices.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.name;
+    opt.textContent = `${v.name} (${v.lang})`;
+    if (jpVoice && v.name === jpVoice.name) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  if (prev) sel.value = prev;
+}
+if (synth) {
+  loadVoices();
+  if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+}
+
+function speak(text) {
+  if (!synth || !text) return;
+  if (speakTimer) clearTimeout(speakTimer);
+  speakTimer = setTimeout(() => {
+    try {
+      synth.cancel();
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.lang = 'ja-JP';
+      if (jpVoice) utt.voice = jpVoice;
+      utt.rate = speakRate; utt.pitch = 1.0; utt.volume = 1.0;
+      const btn = document.getElementById('speakBtn');
+      if (btn) { btn.classList.add('speaking'); btn.textContent = '🔊 재생 중...'; }
+      utt.onend = utt.onerror = () => { if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 듣기'; } };
+      synth.speak(utt);
+    } catch(e) {}
+    speakTimer = null;
+  }, 80);
+}
+
+function speakCurrent() { speak(currentKana); }
+
+// ── SETTINGS ──
+function openSettings() {
+  loadVoices(); // 최신 음성 목록 갱신
+  document.getElementById('rateSlider').value = speakRate;
+  document.getElementById('rateVal').textContent = speakRate;
+  document.getElementById('settingsOverlay').classList.add('open');
+}
+function closeSettings(e) {
+  if (!e || e.target === document.getElementById('settingsOverlay')) {
+    document.getElementById('settingsOverlay').classList.remove('open');
+  }
+}
+function onVoiceChange() {
+  const sel = document.getElementById('voiceSelect');
+  const voices = synth ? synth.getVoices() : [];
+  jpVoice = voices.find(v => v.name === sel.value) || null;
+}
+function onRateChange(val) {
+  speakRate = parseFloat(val);
+  document.getElementById('rateVal').textContent = speakRate.toFixed(1);
+}
+function testVoice() { speak('おはようございます'); }
+
+// ── TABLE ──
+function setScript(s) {
+  currentScript = s;
+  document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('active', ['hira','kata','both'][i] === s));
+  renderTable();
+}
+
+function renderTable() {
+  const el = document.getElementById('tableContent');
+  let html = '<div class="section-title">기본 (清音)</div>';
+  KANA.basic.forEach((item, i) => {
+    if (i % 5 === 0) { if (i > 0) html += '</div>'; html += `<div class="row-label">${ROW_LABELS[i/5]}</div><div class="kana-grid">`; }
+    html += (!item.h || item.rom === '—') ? '<div class="kana-card empty"></div>' : cardHTML(item);
+  });
+  html += '</div><div class="section-title">탁음・반탁음 (濁音・半濁音)</div>';
+  KANA.dakuten.forEach((item, i) => {
+    if (i % 5 === 0) { if (i > 0) html += '</div>'; html += `<div class="row-label">${DAK_LABELS[i/5]}</div><div class="kana-grid">`; }
+    html += cardHTML(item);
+  });
+  html += '</div>';
+  el.innerHTML = html;
+  el.querySelectorAll('.kana-card:not(.empty)').forEach(card => {
+    card.addEventListener('click', () => showPopup(card.dataset.main, card.dataset.alt, card.dataset.rom));
+  });
+}
+
+function cardHTML(item) {
+  const s = currentScript;
+  if (s === 'hira') return `<div class="kana-card" data-main="${item.h}" data-alt="${item.k}" data-rom="${item.rom}"><span class="kana-char">${item.h}</span><span class="kana-rom">${item.rom}</span></div>`;
+  if (s === 'kata') return `<div class="kana-card" data-main="${item.k}" data-alt="${item.h}" data-rom="${item.rom}"><span class="kana-char">${item.k}</span><span class="kana-rom">${item.rom}</span></div>`;
+  return `<div class="kana-card" data-main="${item.h}" data-alt="${item.k}" data-rom="${item.rom}"><span class="kana-char">${item.h}</span><span class="kana-kata">${item.k}</span><span class="kana-rom">${item.rom}</span></div>`;
+}
+
+// ── POPUP ──
+function showPopup(main, alt, rom) {
+  currentKana = main;
+  document.getElementById('popupKana').textContent = main;
+  document.getElementById('popupAlt').textContent = alt;
+  document.getElementById('popupRom').textContent = rom;
+  const btn = document.getElementById('speakBtn');
+  if (btn) { btn.classList.remove('speaking'); btn.textContent = '🔊 듣기'; }
+  document.getElementById('popupOverlay').classList.add('open');
+  speak(main);
+}
+function closePopup(e) {
+  if (!e || e.target === document.getElementById('popupOverlay')) {
+    document.getElementById('popupOverlay').classList.remove('open');
+    if (synth) synth.cancel();
+  }
+}
+
+// ── QUIZ ──
+function getPool() {
+  return [...KANA.basic, ...KANA.dakuten].filter(x => x.rom !== '—' && x.h);
+}
+function setQuizScript(s) {
+  quizScript = s;
+  document.querySelectorAll('.qtype-btn').forEach((b,i) => b.classList.toggle('active', ['hira','kata','both'][i] === s));
+  startQuiz();
+}
+function startQuiz() {
+  quizIndex = 0; quizScore = 0;
+  document.getElementById('quizResult').style.display = 'none';
+  document.getElementById('quizContent').style.display = '';
+  quizItems = [...getPool()].sort(() => Math.random()-0.5).slice(0, QUIZ_LEN);
+  renderQuizProgress(); renderQuizQuestion();
+}
+function renderQuizProgress() {
+  document.getElementById('quizProgress').innerHTML =
+    quizItems.map((_,i) => `<div class="progress-dot${i<quizIndex?' done':i===quizIndex?' current':''}"></div>`).join('');
+}
+function renderQuizQuestion() {
+  if (quizIndex >= quizItems.length) { showResult(); return; }
+  const item = quizItems[quizIndex];
+  let prompt = quizScript==='hira' ? item.h : quizScript==='kata' ? item.k : (Math.random()>0.5 ? item.h : item.k);
+  const hint = (prompt === item.h ? '히라가나' : '가타카나') + ' → 로마자';
+  const wrongs = getPool().filter(x => x.rom !== item.rom).sort(() => Math.random()-0.5).slice(0,3);
+  const choices = [...wrongs, item].sort(() => Math.random()-0.5);
+  const el = document.getElementById('quizContent');
+  el.innerHTML = `
+    <div class="quiz-card" id="quizCard" style="cursor:pointer">
+      <div class="quiz-prompt">${prompt}</div>
+      <div class="quiz-hint">${hint} &nbsp;·&nbsp; 🔊 탭해서 듣기</div>
+    </div>
+    <div class="choices">${choices.map((c,i) => `<button class="choice-btn" data-idx="${i}">${c.rom}</button>`).join('')}</div>`;
+  document.getElementById('quizCard').addEventListener('click', () => speak(prompt));
+  choices.forEach((c, i) => {
+    el.querySelector(`[data-idx="${i}"]`).addEventListener('click', e => {
+      e.stopPropagation();
+      const btns = document.querySelectorAll('.choice-btn');
+      btns.forEach(b => { b.disabled = true; if (b.textContent === item.rom) b.classList.add('correct'); });
+      if (c.rom === item.rom) quizScore++;
+      else el.querySelector(`[data-idx="${i}"]`).classList.add('wrong');
+      speak(item.h);
+      setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 1200);
+    });
+  });
+}
+function showResult() {
+  document.getElementById('quizContent').style.display = 'none';
+  document.getElementById('quizResult').style.display = 'block';
+  document.getElementById('resultScore').textContent = `${quizScore} / ${QUIZ_LEN}`;
+  const pct = quizScore / QUIZ_LEN;
+  document.getElementById('resultMsg').textContent =
+    pct>=0.9 ? '완벽해요! 🎉 거의 다 외웠네요!' : pct>=0.7 ? '잘 하고 있어요! 조금만 더!' :
+    pct>=0.5 ? '절반 이상 맞았어요. 계속 연습해봐요.' : '괜찮아요, 문자표를 다시 보고 도전해봐요!';
+}
+
+// ── CONVERSATION ──
+const PHRASES = {
+  '인사': [
+    { jp:'おはようございます', read:'오하요우 고자이마스', ko:'안녕하세요 (아침)', hint:'아침에 쓰는 정중한 인사' },
+    { jp:'こんにちは', read:'곤니치와', ko:'안녕하세요 (낮)', hint:'낮~오후에 쓰는 인사' },
+    { jp:'こんばんは', read:'곤방와', ko:'안녕하세요 (저녁)', hint:'저녁에 쓰는 인사' },
+    { jp:'おやすみなさい', read:'오야스미나사이', ko:'잘 자요', hint:'자러 갈 때' },
+    { jp:'さようなら', read:'사요우나라', ko:'안녕히 가세요', hint:'격식 있는 작별 인사' },
+    { jp:'じゃあね', read:'쟈아네', ko:'잘 가 / 나중에 봐', hint:'친한 사이에서 가볍게' },
+    { jp:'はじめまして', read:'하지메마시테', ko:'처음 뵙겠습니다', hint:'처음 만날 때' },
+    { jp:'よろしくおねがいします', read:'요로시쿠 오네가이시마스', ko:'잘 부탁드립니다', hint:'인사 마무리에 자주 씀' },
+  ],
+  '감사사과': [
+    { jp:'ありがとうございます', read:'아리가토우 고자이마스', ko:'감사합니다', hint:'정중한 감사 표현' },
+    { jp:'ありがとう', read:'아리가토우', ko:'고마워', hint:'친한 사이에서' },
+    { jp:'どういたしまして', read:'도우이타시마시테', ko:'천만에요', hint:'감사 인사에 대한 답' },
+    { jp:'すみません', read:'스미마센', ko:'실례합니다 / 죄송합니다', hint:'사람 부를 때도 씀' },
+    { jp:'ごめんなさい', read:'고멘나사이', ko:'미안합니다', hint:'진심으로 사과할 때' },
+    { jp:'大丈夫です', read:'다이죠우부 데스', ko:'괜찮아요', hint:'상대를 안심시킬 때' },
+  ],
+  '자기소개': [
+    { jp:'私は学生です', read:'와타시와 각세이 데스', ko:'저는 학생입니다', hint:'직업 소개 예시' },
+    { jp:'韓国から来ました', read:'캉코쿠카라 키마시타', ko:'한국에서 왔습니다', hint:'출신 소개' },
+    { jp:'日本語を勉強しています', read:'니홍고오 벵쿄우시테이마스', ko:'일본어를 공부하고 있습니다', hint:'학습 중임을 표현' },
+    { jp:'お名前は何ですか', read:'오나마에와 난 데스카', ko:'성함이 어떻게 되세요?', hint:'이름 묻기' },
+    { jp:'何歳ですか', read:'난사이 데스카', ko:'몇 살이에요?', hint:'나이 묻기 (친한 사이)' },
+  ],
+  '식당음식': [
+    { jp:'いただきます', read:'이타다키마스', ko:'잘 먹겠습니다', hint:'식사 시작 전 인사' },
+    { jp:'ごちそうさまでした', read:'고치소우사마 데시타', ko:'잘 먹었습니다', hint:'식사 후 인사' },
+    { jp:'メニューをください', read:'메뉴우오 쿠다사이', ko:'메뉴 주세요', hint:'식당에서 주문 전' },
+    { jp:'これをください', read:'코레오 쿠다사이', ko:'이것 주세요', hint:'메뉴 가리키며 주문' },
+    { jp:'おいしいです', read:'오이시이 데스', ko:'맛있어요', hint:'음식 칭찬할 때' },
+    { jp:'お会計をお願いします', read:'오카이케이오 오네가이시마스', ko:'계산해 주세요', hint:'식사 후 계산 요청' },
+  ],
+  '쇼핑교통': [
+    { jp:'いくらですか', read:'이쿠라 데스카', ko:'얼마예요?', hint:'가격 물어볼 때' },
+    { jp:'高いですね', read:'타카이 데스네', ko:'비싸네요', hint:'가격이 비쌀 때' },
+    { jp:'カードで払えますか', read:'카아도데 하라에마스카', ko:'카드로 계산할 수 있나요?', hint:'결제 방법 확인' },
+    { jp:'駅はどこですか', read:'에키와 도코 데스카', ko:'역은 어디예요?', hint:'역 위치 묻기' },
+    { jp:'まっすぐ行ってください', read:'맛스구 잇테 쿠다사이', ko:'직진해 주세요', hint:'길 안내' },
+    { jp:'トイレはどこですか', read:'토이레와 도코 데스카', ko:'화장실이 어디예요?', hint:'화장실 찾기' },
+  ],
+  '긴급기타': [
+    { jp:'助けてください', read:'타스케테 쿠다사이', ko:'도와주세요', hint:'긴급 상황에서' },
+    { jp:'分かりません', read:'와카리마센', ko:'모르겠어요', hint:'이해 못 했을 때' },
+    { jp:'もう一度言ってください', read:'모우 이치도 잇테 쿠다사이', ko:'다시 한번 말해주세요', hint:'되물을 때' },
+    { jp:'ゆっくり話してください', read:'윳쿠리 하나시테 쿠다사이', ko:'천천히 말해주세요', hint:'속도 늦춰달라고 할 때' },
+  ],
+};
+
+let currentCat = Object.keys(PHRASES)[0];
+
+function renderConv() {
+  const cats = Object.keys(PHRASES);
+  const catBar = document.getElementById('convCatBar');
+  catBar.innerHTML = cats.map(c => `<button class="cat-btn${c===currentCat?' active':''}" data-cat="${c}">${c}</button>`).join('');
+  catBar.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => { currentCat = btn.dataset.cat; renderConv(); });
+  });
+  const phrases = PHRASES[currentCat];
+  const content = document.getElementById('convContent');
+  content.innerHTML = `<div class="conv-section-title">${currentCat} — ${phrases.length}개 표현</div>`;
+  phrases.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'phrase-card';
+    card.innerHTML = `<span class="phrase-speak">🔊</span><span class="phrase-jp">${p.jp}</span><span class="phrase-read">${p.read}</span><span class="phrase-ko">${p.ko}</span>${p.hint ? `<span class="phrase-hint">💡 ${p.hint}</span>` : ''}`;
+    card.addEventListener('click', () => speak(p.jp));
+    content.appendChild(card);
+  });
+}
+
+// ── VOCAB ──
+const VOCAB = {
+  '숫자': [
+    { jp:'一', read:'이치', ko:'1', ex:'一つ (히토츠) — 하나' },
+    { jp:'二', read:'니', ko:'2', ex:'二つ (후타츠) — 둘' },
+    { jp:'三', read:'산', ko:'3', ex:'三つ (밋츠) — 셋' },
+    { jp:'四', read:'시 / 욘', ko:'4', ex:'四つ (욧츠) — 넷' },
+    { jp:'五', read:'고', ko:'5', ex:'五つ (이츠츠) — 다섯' },
+    { jp:'六', read:'로쿠', ko:'6', ex:'六つ (뭇츠) — 여섯' },
+    { jp:'七', read:'시치 / 나나', ko:'7', ex:'七つ (나나츠) — 일곱' },
+    { jp:'八', read:'하치', ko:'8', ex:'八つ (야츠) — 여덟' },
+    { jp:'九', read:'쿠 / 큐우', ko:'9', ex:'九つ (코코노츠) — 아홉' },
+    { jp:'十', read:'쥬우', ko:'10', ex:'十 (토오) — 열' },
+    { jp:'百', read:'햐쿠', ko:'100', ex:'百円 — 100엔' },
+    { jp:'千', read:'센', ko:'1,000', ex:'千円 — 1000엔' },
+    { jp:'万', read:'만', ko:'10,000', ex:'一万円 — 1만엔' },
+  ],
+  '대명사': [
+    { jp:'私', read:'와타시', ko:'나 / 저', ex:'私は学生です — 저는 학생입니다' },
+    { jp:'僕', read:'보쿠', ko:'나 (남성 구어)', ex:'남자가 친근하게 쓸 때' },
+    { jp:'あなた', read:'아나타', ko:'당신 / 너', ex:'あなたの名前は？ — 당신 이름은?' },
+    { jp:'彼', read:'카레', ko:'그 / 그 남자', ex:'彼は先生です — 그는 선생님입니다' },
+    { jp:'彼女', read:'카노죠', ko:'그녀 / 여자친구', ex:'彼女は学生です — 그녀는 학생입니다' },
+    { jp:'私たち', read:'와타시타치', ko:'우리', ex:'私たちは友達 — 우리는 친구' },
+    { jp:'これ', read:'코레', ko:'이것', ex:'これは何ですか — 이것은 무엇인가요?' },
+    { jp:'それ', read:'소레', ko:'그것', ex:'それをください — 그것을 주세요' },
+    { jp:'あれ', read:'아레', ko:'저것', ex:'あれは何ですか — 저것은 무엇인가요?' },
+    { jp:'ここ', read:'코코', ko:'여기', ex:'ここはどこ — 여기는 어디야?' },
+    { jp:'そこ', read:'소코', ko:'거기', ex:'そこに座って — 거기 앉아' },
+    { jp:'あそこ', read:'아소코', ko:'저기', ex:'あそこに行きたい — 저기 가고 싶다' },
+  ],
+  '요일시간': [
+    { jp:'月曜日', read:'게츠요우비', ko:'월요일', ex:'' },
+    { jp:'火曜日', read:'카요우비', ko:'화요일', ex:'' },
+    { jp:'水曜日', read:'스이요우비', ko:'수요일', ex:'' },
+    { jp:'木曜日', read:'모쿠요우비', ko:'목요일', ex:'' },
+    { jp:'金曜日', read:'킹요우비', ko:'금요일', ex:'' },
+    { jp:'土曜日', read:'도요우비', ko:'토요일', ex:'' },
+    { jp:'日曜日', read:'니치요우비', ko:'일요일', ex:'' },
+    { jp:'今日', read:'쿄우', ko:'오늘', ex:'今日は何曜日 — 오늘 무슨 요일?' },
+    { jp:'明日', read:'아시타', ko:'내일', ex:'明日また — 내일 또 봐요' },
+    { jp:'昨日', read:'키노우', ko:'어제', ex:'昨日何した — 어제 뭐 했어?' },
+    { jp:'今', read:'이마', ko:'지금', ex:'今何時ですか — 지금 몇 시예요?' },
+    { jp:'朝', read:'아사', ko:'아침', ex:'毎朝 — 매일 아침' },
+    { jp:'昼', read:'히루', ko:'낮', ex:'お昼ご飯 — 점심밥' },
+    { jp:'夜', read:'요루', ko:'밤', ex:'今夜 — 오늘 밤' },
+  ],
+  '색깔': [
+    { jp:'赤', read:'아카', ko:'빨간색', ex:'赤いりんご — 빨간 사과' },
+    { jp:'青', read:'아오', ko:'파란색', ex:'青い空 — 파란 하늘' },
+    { jp:'白', read:'시로', ko:'흰색', ex:'白いシャツ — 흰 셔츠' },
+    { jp:'黒', read:'쿠로', ko:'검은색', ex:'黒い猫 — 검은 고양이' },
+    { jp:'黄色', read:'키이로', ko:'노란색', ex:'黄色い花 — 노란 꽃' },
+    { jp:'緑', read:'미도리', ko:'초록색', ex:'緑の木 — 초록 나무' },
+    { jp:'紫', read:'무라사키', ko:'보라색', ex:'紫の花 — 보라 꽃' },
+    { jp:'ピンク', read:'핑쿠', ko:'분홍색', ex:'ピンクのドレス — 분홍 드레스' },
+    { jp:'茶色', read:'챠이로', ko:'갈색', ex:'茶色い犬 — 갈색 개' },
+  ],
+  '신체': [
+    { jp:'頭', read:'아타마', ko:'머리', ex:'頭が痛い — 머리가 아파요' },
+    { jp:'目', read:'메', ko:'눈', ex:'目が大きい — 눈이 크다' },
+    { jp:'耳', read:'미미', ko:'귀', ex:'耳が聞こえない — 귀가 안 들려요' },
+    { jp:'鼻', read:'하나', ko:'코', ex:'鼻が高い — 코가 높다' },
+    { jp:'口', read:'쿠치', ko:'입', ex:'口を開けて — 입을 열어요' },
+    { jp:'手', read:'테', ko:'손', ex:'手を洗って — 손을 씻어요' },
+    { jp:'足', read:'아시', ko:'발 / 다리', ex:'足が痛い — 다리가 아파요' },
+    { jp:'お腹', read:'오나카', ko:'배', ex:'お腹が空いた — 배가 고파요' },
+  ],
+  '형용사': [
+    { jp:'大きい', read:'오오키이', ko:'크다', ex:'大きい家 — 큰 집' },
+    { jp:'小さい', read:'치이사이', ko:'작다', ex:'小さい犬 — 작은 강아지' },
+    { jp:'高い', read:'타카이', ko:'높다 / 비싸다', ex:'高いビル — 높은 빌딩' },
+    { jp:'速い', read:'하야이', ko:'빠르다', ex:'速い車 — 빠른 차' },
+    { jp:'新しい', read:'아타라시이', ko:'새롭다', ex:'新しい服 — 새 옷' },
+    { jp:'古い', read:'후루이', ko:'오래되다', ex:'古い建物 — 오래된 건물' },
+    { jp:'暑い', read:'아츠이', ko:'덥다', ex:'今日は暑い — 오늘은 덥다' },
+    { jp:'寒い', read:'사무이', ko:'춥다', ex:'冬は寒い — 겨울은 춥다' },
+    { jp:'楽しい', read:'타노시이', ko:'즐겁다', ex:'楽しい旅行 — 즐거운 여행' },
+    { jp:'難しい', read:'무즈카시이', ko:'어렵다', ex:'日本語は難しい — 일본어는 어렵다' },
+  ],
+};
+
+let currentVocabCat = Object.keys(VOCAB)[0];
+
+function renderVocab() {
+  const cats = Object.keys(VOCAB);
+  const catBar = document.getElementById('vocabCatBar');
+  catBar.innerHTML = cats.map(c => `<button class="cat-btn${c===currentVocabCat?' active':''}" data-cat="${c}">${c}</button>`).join('');
+  catBar.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => { currentVocabCat = btn.dataset.cat; renderVocab(); });
+  });
+  const words = VOCAB[currentVocabCat];
+  const content = document.getElementById('vocabContent');
+  content.innerHTML = `<div class="conv-section-title">${currentVocabCat} — ${words.length}개 단어</div>`;
+  words.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'phrase-card';
+    card.innerHTML = `<span class="phrase-speak">🔊</span><span class="phrase-jp">${w.jp}</span><span class="phrase-read">${w.read}</span><span class="phrase-ko">${w.ko}</span>${w.ex ? `<span class="phrase-hint">📝 ${w.ex}</span>` : ''}`;
+    card.addEventListener('click', () => speak(w.jp));
+    content.appendChild(card);
+  });
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  ['table','quiz','conv','vocab'].forEach(t => {
+    const id = 'nav' + t.charAt(0).toUpperCase() + t.slice(1);
+    document.getElementById(id).classList.toggle('active', t === tab);
+  });
+  document.getElementById('tableView').style.display = tab==='table' ? '' : 'none';
+  document.getElementById('quizView').style.display  = tab==='quiz'  ? 'block' : 'none';
+  document.getElementById('convView').style.display  = tab==='conv'  ? 'block' : 'none';
+  document.getElementById('vocabView').style.display = tab==='vocab' ? 'block' : 'none';
+  if (tab==='quiz')  startQuiz();
+  if (tab==='conv')  renderConv();
+  if (tab==='vocab') renderVocab();
+  if (synth) synth.cancel();
+}
+
+// init
+renderTable();
+</script>
+</body>
+</html>
