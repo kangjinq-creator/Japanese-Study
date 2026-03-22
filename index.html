@@ -1237,20 +1237,21 @@ function renderQuizQuestion() {
       if (c.rom === item.rom) {
         quizScore++;
         speak('正解です！');
+        setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 2800);
       } else {
         el.querySelector(`[data-idx="${i}"]`).classList.add('wrong');
-        // 순차 재생: 아쉬워요 → (간격) → 정답은 → (간격) → 가나 → (간격) → 입니다
         (async () => {
           await speakAndWait('惜しいです。');
-          await delay(300);
+          await delay(150);
           await speakAndWait('正解は');
-          await delay(400);
+          await delay(200);
           await speakAndWait(item.h);
-          await delay(300);
+          await delay(150);
           await speakAndWait('です。');
+          await delay(400);
+          quizIndex++; renderQuizProgress(); renderQuizQuestion();
         })();
       }
-      setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 3800);
     });
   });
 }
