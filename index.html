@@ -1043,7 +1043,35 @@ const GCLOUD_VOICES = [
 
 let selectedVoice = 'ja-JP-Neural2-C'; // 기본: 남성
 
-async function speak(text) {
+// 재생이 끝날 때까지 기다리는 speak
+async function speakAndWait(text) {
+  return new Promise(async (resolve) => {
+    if (!text) return resolve();
+    try {
+      const res = await fetch(
+        `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GCLOUD_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input: { text },
+            voice: { languageCode: 'ja-JP', name: selectedVoice },
+            audioConfig: { audioEncoding: 'MP3', speakingRate: speakRate, pitch: speakPitch }
+          })
+        }
+      );
+      const data = await res.json();
+      if (!data.audioContent) return resolve();
+      if (audioEl) { audioEl.pause(); audioEl = null; }
+      audioEl = new Audio('data:audio/mp3;base64,' + data.audioContent);
+      audioEl.onended = () => resolve();
+      audioEl.onerror = () => resolve();
+      audioEl.play();
+    } catch(e) { resolve(); }
+  });
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
   if (!text) return;
   if (speakTimer) clearTimeout(speakTimer);
   speakTimer = setTimeout(async () => {
@@ -1209,9 +1237,18 @@ function renderQuizQuestion() {
         speak('正解です！');
       } else {
         el.querySelector(`[data-idx="${i}"]`).classList.add('wrong');
-        speak('惜しいです。正解は' + item.h + 'です。');
+        // 순차 재생: 아쉬워요 → (간격) → 정답은 → (간격) → 가나 → (간격) → 입니다
+        (async () => {
+          await speakAndWait('惜しいです。');
+          await delay(300);
+          await speakAndWait('正解は');
+          await delay(400);
+          await speakAndWait(item.h);
+          await delay(300);
+          await speakAndWait('です。');
+        })();
       }
-      setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 2800);
+      setTimeout(() => { quizIndex++; renderQuizProgress(); renderQuizQuestion(); }, 3800);
     });
   });
 }
