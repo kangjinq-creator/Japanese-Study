@@ -5,17 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f5f0e8">
+<meta name="theme-color" content="#2e7d52">
 <title>Qyu의 일본어 교과서</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+KR:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink: #1a1410;
-    --paper: #f5f0e8;
-    --accent: #c0392b;
-    --gold: #d4a017;
-    --muted: #8b7355;
-    --card-bg: #fdfaf4;
+    --ink: #1b2e1e;
+    --paper: #f0f4f0;
+    --accent: #2e7d52;
+    --accent2: #4caf78;
+    --gold: #f0a500;
+    --muted: #6b8f71;
+    --card-bg: #ffffff;
+    --nav-bg: #2e7d52;
+    --nav-active: #ffffff;
+    --nav-inactive: rgba(255,255,255,0.55);
+    --header-bg: #2e7d52;
+    --radius-card: 12px;
+    --shadow-card: 0 1px 4px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.05);
     --nav-h: 64px;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -28,14 +35,10 @@
   }
 
   body {
-    background: #e8e3db;
+    background: #eef1ee;
     color: var(--ink);
     font-family: 'Noto Sans KR', sans-serif;
     min-height: 100vh;
-    background-image:
-      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(0,0,0,0.03) 39px, rgba(0,0,0,0.03) 40px),
-      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(0,0,0,0.03) 39px, rgba(0,0,0,0.03) 40px);
-    background-size: 40px 40px;
     padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 24px);
   }
 
@@ -46,9 +49,9 @@
     gap: 12px;
     padding: 10px 14px;
     margin: 10px 12px 0;
-    background: var(--card-bg);
+    background: var(--header-bg);
     border-radius: 18px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.07);
+    box-shadow: 0 3px 14px rgba(46,125,82,0.30);
   }
 
   .header-avatar-wrap {
@@ -80,8 +83,8 @@
     position: absolute;
     bottom: -2px; right: -2px;
     width: 18px; height: 18px;
-    background: var(--card-bg);
-    border: 1.5px solid rgba(0,0,0,0.15);
+    background: #ffffff;
+    border: 1.5px solid rgba(46,125,82,0.3);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 11px;
@@ -97,12 +100,12 @@
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 1.05rem;
     letter-spacing: 0.04em;
-    color: var(--ink);
+    color: #ffffff;
     line-height: 1.2;
   }
 
   header p {
-    color: var(--muted);
+    color: rgba(255,255,255,0.75);
     font-size: 0.68rem;
     margin-top: 2px;
     font-weight: 300;
@@ -114,9 +117,9 @@
     bottom: calc(10px + var(--safe-bottom));
     left: 12px; right: 12px;
     height: var(--nav-h);
-    background: var(--card-bg);
+    background: var(--nav-bg);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 20px rgba(46,125,82,0.35), 0 1px 4px rgba(0,0,0,0.1);
     display: flex;
     z-index: 50;
     overflow: hidden;
@@ -132,7 +135,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--muted);
+    color: var(--nav-inactive);
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 0.7rem;
     font-weight: 400;
@@ -151,7 +154,7 @@
     display: block;
     margin: 0 auto;
   }
-  .nav-btn.active { color: var(--accent); }
+  .nav-btn.active { color: var(--nav-active); font-weight: 600; }
   .nav-btn.active .nav-icon { font-weight: 700; }
 
   /* ── MODE BAR ── */
@@ -168,13 +171,13 @@
   .mode-btn {
     padding: 9px 18px;
     border: none;
-    background: #ede8df;
+    background: #ddeee3;
     cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 0.78rem;
     color: var(--muted);
     border-radius: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: all 0.2s;
     min-height: 40px;
     min-width: 80px;
@@ -183,10 +186,10 @@
   }
   .mode-btn:active { transform: scale(0.95); }
   .mode-btn.active {
-    background: var(--card-bg);
-    color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 3px 10px rgba(192,57,43,0.18), 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 10px rgba(46,125,82,0.30);
   }
 
   /* ── TABLE VIEW ── */
@@ -214,13 +217,14 @@
 
   .kana-card {
     background: var(--card-bg);
-    border: 1.5px solid rgba(0,0,0,0.1);
+    border: none;
     padding: 12px 4px;
     text-align: center;
     cursor: pointer;
-    transition: background 0.12s;
+    transition: transform 0.12s, box-shadow 0.12s;
     position: relative;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-card);
     min-height: 68px;
     display: flex;
     flex-direction: column;
@@ -230,9 +234,9 @@
     user-select: none;
   }
   .kana-card:active {
-    background: #fff0e8;
-    border-color: var(--accent);
-    transform: scale(0.96);
+    background: #f0f9f4;
+    transform: scale(0.94);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   }
 
   .kana-char {
@@ -260,6 +264,7 @@
     background: transparent;
     border: 1.5px dashed rgba(0,0,0,0.08);
     box-shadow: none;
+    border-radius: var(--radius-card);
     cursor: default;
   }
   .kana-card.empty:active { transform: none; background: transparent; border-color: rgba(0,0,0,0.08); }
@@ -288,16 +293,15 @@
 
   .popup {
     background: var(--card-bg);
-    border: 2px solid var(--ink);
-    border-bottom: none;
+    border: none;
     padding: 32px 50px calc(24px + var(--safe-bottom));
     text-align: center;
-    box-shadow: 0 -6px 0 var(--ink);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
     width: 100%;
     max-width: 480px;
     position: relative;
     animation: slideUp 0.22s ease;
-    border-radius: 0;
+    border-radius: 20px 20px 0 0;
   }
   @keyframes slideUp {
     from { transform: translateY(100%); opacity: 0; }
@@ -356,15 +360,16 @@
   .progress-dot {
     flex: 1; height: 4px;
     background: rgba(0,0,0,0.1);
-    border-radius: 0;
+    border-radius: 2px;
   }
   .progress-dot.done { background: var(--accent); }
-  .progress-dot.current { background: var(--gold); }
+  .progress-dot.current { background: var(--accent2); }
 
   .quiz-card {
     background: var(--card-bg);
-    border: 2px solid var(--ink);
-    box-shadow: 5px 5px 0 var(--ink);
+    border: none;
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-card);
     padding: 40px 20px 32px;
     text-align: center;
     margin-bottom: 20px;
@@ -391,22 +396,23 @@
 
   .choice-btn {
     padding: 20px 10px;
-    border: 2px solid var(--ink);
+    border: none;
     background: var(--card-bg);
     cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 1.1rem;
     color: var(--ink);
-    transition: background 0.12s;
+    transition: transform 0.12s, box-shadow 0.12s;
     letter-spacing: 0.1em;
-    box-shadow: 3px 3px 0 var(--ink);
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-card);
     min-height: 64px;
     -webkit-user-select: none;
     user-select: none;
   }
-  .choice-btn:active:not(:disabled) { transform: scale(0.97); }
-  .choice-btn.correct { background: #e8f5e9; border-color: #2e7d32; box-shadow: 3px 3px 0 #2e7d32; color: #2e7d32; }
-  .choice-btn.wrong   { background: #fdecea; border-color: var(--accent); box-shadow: 3px 3px 0 var(--accent); color: var(--accent); }
+  .choice-btn:active:not(:disabled) { transform: scale(0.96); box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+  .choice-btn.correct { background: #e8f5ee; box-shadow: 0 0 0 2px #2e7d52; color: #2e7d52; font-weight: 600; }
+  .choice-btn.wrong   { background: #fdecea; box-shadow: 0 0 0 2px #e53935; color: #e53935; }
   .choice-btn:disabled { cursor: default; }
 
   .quiz-result {
@@ -427,16 +433,17 @@
   }
   .restart-btn {
     padding: 16px 40px;
-    border: 2px solid var(--ink);
-    background: var(--ink);
-    color: var(--paper);
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
     cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 0.9rem;
-    box-shadow: 4px 4px 0 var(--accent);
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(46,125,82,0.35);
     transition: all 0.15s;
   }
-  .restart-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--accent); }
+  .restart-btn:active { transform: scale(0.97); box-shadow: 0 2px 6px rgba(46,125,82,0.2); }
 
   .quiz-type-bar {
     display: flex;
@@ -447,13 +454,13 @@
   .qtype-btn {
     padding: 9px 18px;
     border: none;
-    background: #ede8df;
+    background: #ddeee3;
     cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 0.8rem;
     color: var(--muted);
     border-radius: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: all 0.2s;
     min-height: 40px;
     -webkit-user-select: none;
@@ -461,10 +468,10 @@
   }
   .qtype-btn:active { transform: scale(0.95); }
   .qtype-btn.active {
-    background: var(--card-bg);
-    color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 3px 10px rgba(192,57,43,0.18), 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 10px rgba(46,125,82,0.30);
   }
   .speak-btn {
     margin-top: 20px;
@@ -503,7 +510,7 @@
   .cat-btn {
     padding: 8px 16px;
     border: none;
-    background: #ede8df;
+    background: #ddeee3;
     cursor: pointer;
     font-family: 'Noto Sans KR', sans-serif;
     font-size: 0.78rem;
@@ -512,7 +519,7 @@
     flex-shrink: 0;
     min-height: 38px;
     border-radius: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     transition: transform 0.15s, box-shadow 0.2s, background 0.2s, color 0.2s;
     -webkit-user-select: none;
     user-select: none;
@@ -521,16 +528,17 @@
   }
   .cat-btn:active, .cat-btn.pressing { transform: scale(0.95); }
   .cat-btn.active {
-    background: var(--card-bg);
-    color: var(--accent);
+    background: var(--accent);
+    color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 3px 10px rgba(192,57,43,0.18), 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 3px 10px rgba(46,125,82,0.30);
   }
 
   .phrase-card {
     background: var(--card-bg);
-    border: 1.5px solid rgba(0,0,0,0.1);
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.07);
+    border: none;
+    box-shadow: var(--shadow-card);
+    border-radius: var(--radius-card);
     margin-bottom: 10px;
     padding: 16px;
     cursor: pointer;
@@ -538,7 +546,7 @@
     -webkit-user-select: none;
     user-select: none;
   }
-  .phrase-card:active { background: #fff0e8; border-color: var(--accent); }
+  .phrase-card:active { background: #f0f9f4; transform: scale(0.99); }
 
   .phrase-jp {
     font-family: 'Noto Serif JP', serif;
@@ -598,7 +606,9 @@
 
   .settings-panel {
     background: var(--card-bg);
-    border: 2px solid var(--ink); border-bottom: none;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12); border-bottom: none;
     box-shadow: 0 -6px 0 var(--ink);
     width: 100%; max-width: 480px;
     padding: 24px 24px calc(20px + var(--safe-bottom));
@@ -746,18 +756,19 @@
   }
   .news-item {
     background: var(--card-bg);
-    border: 1.5px solid rgba(0,0,0,0.1);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+    border: none;
+    box-shadow: var(--shadow-card);
     padding: 12px 14px;
     margin-bottom: 8px;
+    border-radius: var(--radius-card);
     cursor: pointer;
-    transition: background 0.12s;
+    transition: background 0.12s, transform 0.12s;
     text-decoration: none;
     display: block;
     -webkit-user-select: none;
     user-select: none;
   }
-  .news-item:active { background: #fff0e8; border-color: var(--accent); }
+  .news-item:active { background: #f0f9f4; transform: scale(0.99); }
   .news-jp {
     font-family: 'Noto Serif JP', serif;
     font-size: 0.95rem;
@@ -787,18 +798,19 @@
   /* iTunes 랭킹 */
   .itunes-item {
     background: var(--card-bg);
-    border: 1.5px solid rgba(0,0,0,0.1);
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+    border: none;
+    box-shadow: var(--shadow-card);
     padding: 10px 14px;
     margin-bottom: 8px;
+    border-radius: var(--radius-card);
     display: flex;
     align-items: center;
     gap: 12px;
     cursor: pointer;
     text-decoration: none;
-    transition: background 0.12s;
+    transition: background 0.12s, transform 0.12s;
   }
-  .itunes-item:active { background: #fff0e8; border-color: var(--accent); }
+  .itunes-item:active { background: #f0f9f4; transform: scale(0.99); }
   .itunes-rank {
     font-family: 'Noto Serif JP', serif;
     font-size: 1.1rem;
