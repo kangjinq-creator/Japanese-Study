@@ -724,6 +724,55 @@
     padding: 16px 0;
   }
 
+  /* iTunes 랭킹 */
+  .itunes-item {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(0,0,0,0.1);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.12s;
+  }
+  .itunes-item:active { background: #fff0e8; border-color: var(--accent); }
+  .itunes-rank {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 24px;
+    text-align: center;
+  }
+  .itunes-thumb {
+    width: 44px; height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .itunes-info { flex: 1; min-width: 0; }
+  .itunes-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.85rem;
+    color: var(--ink);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .itunes-artist {
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .read-btn:active {
     background: rgba(192,57,43,0.08);
     border-color: var(--accent);
@@ -779,6 +828,17 @@
     <button class="news-refresh" onclick="loadNews()" title="새로고침">🔄 새로고침</button>
   </div>
   <div id="newsList"><div class="news-loading">뉴스를 불러오는 중...</div></div>
+
+  <div class="news-section-title" style="margin-top:28px;">
+    🎌 日本のランキング — 일본 인기 TOP 10
+    <button class="news-refresh" onclick="loadiTunes()" title="새로고침">🔄</button>
+  </div>
+  <div class="conv-category-bar" id="itunesCatBar">
+    <button class="cat-btn active" data-cat="apps" onclick="setiTunesCat(this,'apps')">📱 앱</button>
+    <button class="cat-btn" data-cat="music" onclick="setiTunesCat(this,'music')">🎵 음악</button>
+    <button class="cat-btn" data-cat="books" onclick="setiTunesCat(this,'books')">📚 책</button>
+  </div>
+  <div id="itunesList"><div class="news-loading">로딩 중...</div></div>
 </div>
 
 <!-- TABLE VIEW -->
@@ -1358,6 +1418,43 @@ async function loadNews() {
   });
 }
 
+// ── iTunes Japan Ranking ──
+let currentItunesCat = 'apps';
+const ITUNES_ENDPOINTS = {
+  apps:  'https://rss.applemarketingtools.com/api/v2/jp/apps/top-free/10/apps.json',
+  music: 'https://rss.applemarketingtools.com/api/v2/jp/music/most-played/10/albums.json',
+  books: 'https://rss.applemarketingtools.com/api/v2/jp/books/top-free/10/books.json',
+};
+
+function setiTunesCat(btn, cat) {
+  currentItunesCat = cat;
+  document.querySelectorAll('#itunesCatBar .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadiTunes();
+}
+
+async function loadiTunes() {
+  const el = document.getElementById('itunesList');
+  if (!el) return;
+  el.innerHTML = '<div class="news-loading">⏳ 로딩 중...</div>';
+  try {
+    const res = await fetch(ITUNES_ENDPOINTS[currentItunesCat], { signal: AbortSignal.timeout(8000) });
+    const data = await res.json();
+    const items = data.feed.results;
+    el.innerHTML = items.map((item, i) => `
+      <a class="itunes-item" href="${item.url}" target="_blank" rel="noopener">
+        <span class="itunes-rank">${i + 1}</span>
+        <img class="itunes-thumb" src="${item.artworkUrl100}" alt="" onerror="this.style.display='none'">
+        <span class="itunes-info">
+          <span class="itunes-name">${item.name}</span>
+          <span class="itunes-artist">${item.artistName || item.genres?.[0]?.name || ''}</span>
+        </span>
+      </a>`).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="news-error">불러오지 못했어요. 🔄 다시 시도해보세요.</div>';
+  }
+}
+
 // ── TABS ──
 function switchTab(tab) {
   ['home','table','quiz','conv','vocab'].forEach(t => {
@@ -1372,7 +1469,7 @@ function switchTab(tab) {
   if (tab==='quiz')  startQuiz();
   if (tab==='conv')  renderConv();
   if (tab==='vocab') renderVocab();
-  if (tab==='home')  loadNews();
+  if (tab==='home')  { loadNews(); loadiTunes(); }
   if (tab==='table') { currentScript = 'hira'; document.querySelectorAll('.mode-btn').forEach((b,i) => b.classList.toggle('active', i===0)); renderTable(); }
   if (synth) synth.cancel();
 }
